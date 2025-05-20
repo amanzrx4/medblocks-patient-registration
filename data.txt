@@ -1,0 +1,15 @@
+patient registration form
+
+- registration date & time(only till minutes) with an option of `now` button
+- patient name (first, last)
+- sex
+- dob
+- phone number with country code
+- email
+- address (line 1, 2), city, state, postal/zip code
+
+
+- reason for registration
+- additional notes
+
+- additional fields ?

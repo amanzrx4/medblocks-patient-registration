@@ -1,6 +1,7 @@
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
-import Home from './pages/Home'
+import HomePage from './pages/Home'
+import RegistrationPage from './pages/Registration'
 
 // we need routes
 // - home Route
@@ -13,7 +14,10 @@ function App() {
     <>
       <Navbar />
       <Route path="/">
-        <Home />
+        <HomePage />
+      </Route>
+      <Route path="/patient-registration">
+        <RegistrationPage />
       </Route>
     </>
   )

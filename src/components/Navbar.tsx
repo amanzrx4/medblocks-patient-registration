@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { MEDBLOCKS_LOGO_URL_X } from '@/utils'
 import { Link } from 'wouter'
 
 const menuItems = [
@@ -19,7 +20,8 @@ const menuItems = [
     name: 'Contact',
     href: '/contact'
   }
-]
+] as const
+
 
 export default function Navbar() {
   return (
@@ -34,7 +36,7 @@ export default function Navbar() {
         <SheetContent side="left">
           <Link href="#" className="mr-6 hidden lg:flex">
             <img
-              src="https://pbs.twimg.com/profile_images/1615653896709607424/sDaJ4TGC_400x400.png"
+              src={MEDBLOCKS_LOGO_URL_X}
               alt="medblocks"
             />
             <span className="sr-only">Acme Inc</span>
@@ -55,7 +57,7 @@ export default function Navbar() {
       <Link href="/" className="mr-6 hidden lg:flex items-center gap-2">
         <img
           className="h-12 w-auto"
-          src="https://pbs.twimg.com/profile_images/1615653896709607424/sDaJ4TGC_400x400.png"
+          src={MEDBLOCKS_LOGO_URL_X}
           alt="medblocks"
         />
         <span className="sr-only">Acme Inc</span>
