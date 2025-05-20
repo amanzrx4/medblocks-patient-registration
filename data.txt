@@ -11,5 +11,6 @@ patient registration form
 
 - reason for registration
 - additional notes
+- patient history
 
 - additional fields ?

@@ -31,7 +31,8 @@ const formSchema = z.object({
   state: z.string().min(1, 'State is required'),
   postalCode: z.string().min(1, 'Postal code is required'),
   reason: z.string().min(1, 'Reason for registration is required'),
-  additionalNotes: z.string().optional()
+  additionalNotes: z.string().optional(),
+  patientHistory: z.string().optional()
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -46,6 +47,12 @@ export default function RegistrationForm() {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema)
   })
+
+  function renderError(error: (typeof errors)[keyof typeof errors]) {
+    return error ? (
+      <p className="text-sm text-red-500 mt-1">{error.message}</p>
+    ) : null
+  }
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -110,11 +117,7 @@ export default function RegistrationForm() {
                     Now
                   </Button>
                 </div>
-                {errors.registrationDateTime && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.registrationDateTime.message}
-                  </p>
-                )}
+                {renderError(errors.registrationDateTime)}
               </div>
             </div>
           </div>
@@ -136,11 +139,7 @@ export default function RegistrationForm() {
                   errors.firstName ? 'border-red-500' : ''
                 }`}
               />
-              {errors.firstName && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.firstName.message}
-                </p>
-              )}
+              {renderError(errors.firstName)}
             </div>
 
             <div className="flex flex-col">
@@ -158,11 +157,7 @@ export default function RegistrationForm() {
                   errors.lastName ? 'border-red-500' : ''
                 }`}
               />
-              {errors.lastName && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.lastName.message}
-                </p>
-              )}
+              {renderError(errors.lastName)}
             </div>
           </div>
 
@@ -187,11 +182,7 @@ export default function RegistrationForm() {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
-              {errors.sex && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.sex.message}
-                </p>
-              )}
+              {renderError(errors.sex)}
             </div>
 
             <div className="flex flex-col">
@@ -209,11 +200,7 @@ export default function RegistrationForm() {
                   errors.dob ? 'border-red-500' : ''
                 }`}
               />
-              {errors.dob && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.dob.message}
-                </p>
-              )}
+              {renderError(errors.dob)}
             </div>
           </div>
 
@@ -235,11 +222,7 @@ export default function RegistrationForm() {
                 }`}
                 placeholder="+1 234 567 8900"
               />
-              {errors.phoneNumber && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.phoneNumber.message}
-                </p>
-              )}
+              {renderError(errors.phoneNumber)}
             </div>
 
             <div className="flex flex-col">
@@ -257,11 +240,7 @@ export default function RegistrationForm() {
                   errors.email ? 'border-red-500' : ''
                 }`}
               />
-              {errors.email && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.email.message}
-                </p>
-              )}
+              {renderError(errors.email)}
             </div>
           </div>
 
@@ -285,11 +264,7 @@ export default function RegistrationForm() {
                     errors.addressLine1 ? 'border-red-500' : ''
                   }`}
                 />
-                {errors.addressLine1 && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.addressLine1.message}
-                  </p>
-                )}
+                {renderError(errors.addressLine1)}
               </div>
 
               <div className="flex flex-col">
@@ -307,11 +282,7 @@ export default function RegistrationForm() {
                     errors.addressLine2 ? 'border-red-500' : ''
                   }`}
                 />
-                {errors.addressLine2 && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.addressLine2.message}
-                  </p>
-                )}
+                {renderError(errors.addressLine2)}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -330,11 +301,7 @@ export default function RegistrationForm() {
                       errors.city ? 'border-red-500' : ''
                     }`}
                   />
-                  {errors.city && (
-                    <p className="text-sm text-red-500 mt-1">
-                      {errors.city.message}
-                    </p>
-                  )}
+                  {renderError(errors.city)}
                 </div>
 
                 <div className="flex flex-col">
@@ -352,11 +319,7 @@ export default function RegistrationForm() {
                       errors.state ? 'border-red-500' : ''
                     }`}
                   />
-                  {errors.state && (
-                    <p className="text-sm text-red-500 mt-1">
-                      {errors.state.message}
-                    </p>
-                  )}
+                  {renderError(errors.state)}
                 </div>
 
                 <div className="flex flex-col">
@@ -374,11 +337,7 @@ export default function RegistrationForm() {
                       errors.postalCode ? 'border-red-500' : ''
                     }`}
                   />
-                  {errors.postalCode && (
-                    <p className="text-sm text-red-500 mt-1">
-                      {errors.postalCode.message}
-                    </p>
-                  )}
+                  {renderError(errors.postalCode)}
                 </div>
               </div>
             </div>
@@ -400,11 +359,7 @@ export default function RegistrationForm() {
                 errors.reason ? 'border-red-500' : ''
               }`}
             />
-            {errors.reason && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.reason.message}
-              </p>
-            )}
+            {renderError(errors.reason)}
           </div>
 
           {/* Additional Notes */}
@@ -423,11 +378,26 @@ export default function RegistrationForm() {
               }`}
               placeholder="Any additional notes or information"
             />
-            {errors.additionalNotes && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.additionalNotes.message}
-              </p>
-            )}
+            {renderError(errors.additionalNotes)}
+          </div>
+
+          {/* Patient history */}
+          <div className="flex flex-col">
+            <label
+              htmlFor="additionalNotes"
+              className="text-sm font-medium text-gray-700 mb-1"
+            >
+              Patient history
+            </label>
+            <textarea
+              id="additionalNotes"
+              {...register('additionalNotes')}
+              className={`p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] ${
+                errors.patientHistory ? 'border-red-500' : ''
+              }`}
+              placeholder="eg: suffering from high bp"
+            />
+            {renderError(errors.patientHistory)}
           </div>
 
           <div className="space-y-4">
