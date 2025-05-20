@@ -1,3 +1,5 @@
+import { REPOSITORY_GITHUB_URL } from "@/utils";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -49,7 +51,7 @@ export default function Home() {
           <p className="text-gray-600">
             For more information, check out our{' '}
             <a 
-              href="https://github.com/amanzrx4/medblocks-patient-registration" 
+              href={REPOSITORY_GITHUB_URL} 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
