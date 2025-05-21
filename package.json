@@ -12,7 +12,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "clean-install": "rm -rf node_modules && rm -rf yarn.lock && yarn install"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
