@@ -20,12 +20,15 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Editor } from '@monaco-editor/react'
 import { Database, Search } from 'lucide-react'
-import { useState } from 'react'
+import { lazy, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLocation, useRoute } from 'wouter'
 import { z } from 'zod'
+
+const Editor = lazy(() =>
+  import('@monaco-editor/react').then((mod) => ({ default: mod.Editor }))
+)
 
 const querySchema = z.object({
   searchType: z.enum(['name', 'email']),
