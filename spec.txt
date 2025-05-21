@@ -1,0 +1,46 @@
+patient registration form
+
+- registration date & time(only till minutes) with an option of `now` button
+- patient name (first, last)
+- sex
+- dob
+- phone number with country code
+- email
+- address (line 1, 2), city, state, postal/zip code
+
+
+- reason for registration
+- additional notes
+- patient history
+
+- additional fields ?
+
+
+ ## sql schema
+
+  registrationDateTime: z.string().min(1, 'Registration date is required'),
+  keyValuePairs: z.array(keyValueSchema).optional(),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().optional(),
+  sex: z.enum(['male', 'female', 'other'], {
+    required_error: 'Sex is required',
+    invalid_type_error: 'Please select a valid sex'
+  }),
+  dob: z.string().min(1, 'Date of birth is required'),
+  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
+  // .regex(
+  //   /^\+[1-9]\d{1,14}$/,
+  //   'Please enter a valid phone number with country code'
+  // ),
+  email: z.string().email('Please enter a valid email address'),
+  addressLine1: z.string().min(1, 'Address line 1 is required'),
+  addressLine2: z.string().optional(),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  postalCode: z.string().min(1, 'Postal code is required'),
+  reason: z.string().min(1, 'Reason for registration is required'),
+  additionalNotes: z.string().optional(),
+  patientHistory: z.string().optional(),
+  photo: z.string().optional()
+})
+
