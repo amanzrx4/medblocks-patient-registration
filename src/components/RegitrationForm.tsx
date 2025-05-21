@@ -3,6 +3,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from './ui/button'
+import PhotoDialog from './PhotoDialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from './ui/tooltip'
+import { Camera, HelpCircle, X } from 'lucide-react'
 
 const keyValueSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -32,10 +40,11 @@ const formSchema = z.object({
   postalCode: z.string().min(1, 'Postal code is required'),
   reason: z.string().min(1, 'Reason for registration is required'),
   additionalNotes: z.string().optional(),
-  patientHistory: z.string().optional()
+  patientHistory: z.string().optional(),
+  photo: z.string().optional()
 })
 
-type FormData = z.infer<typeof formSchema>
+export type FormData = z.infer<typeof formSchema>
 
 export default function RegistrationForm() {
   const {
@@ -43,10 +52,13 @@ export default function RegistrationForm() {
     handleSubmit,
     formState: { errors },
     setValue,
-    control
+    control,
+    watch
   } = useForm<FormData>({
     resolver: zodResolver(formSchema)
   })
+
+  const photo = watch('photo')
 
   function renderError(error: (typeof errors)[keyof typeof errors]) {
     return error ? (
@@ -69,13 +81,66 @@ export default function RegistrationForm() {
 
   console.log('errors', errors)
   return (
-    <>
+    <TooltipProvider>
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mb-10">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">
           Patient Registration
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Photo Upload */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-1">
+              <label
+                htmlFor="photo"
+                className="text-sm font-medium text-gray-700"
+              >
+                Photo (Optional)
+              </label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Upload a patient photo or transcript photo</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="flex items-start gap-4">
+              <PhotoDialog
+                onPhotoCapture={(photo) => setValue('photo', photo)}
+                trigger={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Camera className="w-4 h-4" />
+                    {photo ? 'Change Photo' : 'Add Photo'}
+                  </Button>
+                }
+              />
+              {photo && (
+                <div className="relative w-24 h-24">
+                  <img
+                    src={photo}
+                    alt="Patient"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute -top-2 -right-2 w-6 h-6"
+                    onClick={() => setValue('photo', '')}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Registration Date & Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col">
@@ -100,10 +165,6 @@ export default function RegistrationForm() {
                     type="button"
                     variant="ghost"
                     onClick={() => {
-                      // const now = new Date()
-                      // const formattedDateTime = now.toISOString().slice(0, 16)
-
-                      // store the unix timestamp
                       const now = new Date()
                       const unixTimestamp = Math.floor(now.getTime() / 1000)
                       const formattedDateTime = new Date(unixTimestamp * 1000)
@@ -480,6 +541,6 @@ export default function RegistrationForm() {
         </form>
       </div>
       <DevTool control={control} /> {/* set up the dev tool */}
-    </>
+    </TooltipProvider>
   )
 }
