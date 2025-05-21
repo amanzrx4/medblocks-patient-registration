@@ -2,6 +2,7 @@ import { Route } from 'wouter'
 import Navbar from './components/Navbar'
 import HomePage from './pages/Home'
 import RegistrationPage from './pages/Registration'
+import PatientRecords from './pages/PatientRecords'
 
 // we need routes
 // - home Route
@@ -18,6 +19,9 @@ function App() {
       </Route>
       <Route path="/patient-registration">
         <RegistrationPage />
+      </Route>
+      <Route path="/patient-records/:queryType?">
+        <PatientRecords />
       </Route>
     </>
   )
