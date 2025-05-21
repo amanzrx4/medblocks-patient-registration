@@ -15,13 +15,8 @@ const menuItems = [
   {
     name: 'Patient Records',
     href: '/patient-records'
-  },
-  {
-    name: 'Contact',
-    href: '/contact'
   }
 ] as const
-
 
 export default function Navbar() {
   return (
@@ -35,11 +30,8 @@ export default function Navbar() {
         </SheetTrigger>
         <SheetContent side="left">
           <Link href="#" className="mr-6 hidden lg:flex">
-            <img
-              src={MEDBLOCKS_LOGO_URL_X}
-              alt="medblocks"
-            />
-            <span className="sr-only">Acme Inc</span>
+            <img src={MEDBLOCKS_LOGO_URL_X} alt="medblocks" />
+            <span className="sr-only">Medblocks</span>
           </Link>
           <div className="grid gap-2 py-6 ml-2">
             {menuItems.map((item) => (
@@ -60,7 +52,7 @@ export default function Navbar() {
           src={MEDBLOCKS_LOGO_URL_X}
           alt="medblocks"
         />
-        <span className="sr-only">Acme Inc</span>
+        <span className="sr-only">Medblocks</span>
         <h1 className="text-xl font-bold text-medblocks-blue">Medblocks</h1>
       </Link>
       <nav className="ml-auto hidden lg:flex gap-6">
