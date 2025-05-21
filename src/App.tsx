@@ -6,8 +6,6 @@ import RegistrationPage from './pages/Registration'
 import { PGlite } from '@electric-sql/pglite'
 import { PGliteProvider } from '@electric-sql/pglite-react'
 import { live } from '@electric-sql/pglite/live'
-import './App.css'
-
 
 // we need routes
 // - home Route
