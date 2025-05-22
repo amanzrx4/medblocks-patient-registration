@@ -1,11 +1,11 @@
+import { PGlite } from '@electric-sql/pglite'
+import { PGliteProvider } from '@electric-sql/pglite-react'
+import { live } from '@electric-sql/pglite/live'
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
 import HomePage from './pages/Home'
 import PatientRecords from './pages/PatientRecords'
 import RegistrationPage from './pages/Registration'
-import { PGlite } from '@electric-sql/pglite'
-import { PGliteProvider } from '@electric-sql/pglite-react'
-import { live } from '@electric-sql/pglite/live'
 import { createTableSchema } from './schema/postgres'
 // we need routes
 // - home Route
