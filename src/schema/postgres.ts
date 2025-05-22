@@ -18,7 +18,7 @@ export const createTableSchema = sql`CREATE TABLE IF NOT EXISTS patients (
     city TEXT NOT NULL,
     state TEXT NOT NULL,
     -- postal code can have characters too.
-    postal_code INTEGER NOT NULL,
+    postal_code TEXT NOT NULL,
     reason TEXT NOT NULL,
     additional_notes TEXT,
     patient_history TEXT,

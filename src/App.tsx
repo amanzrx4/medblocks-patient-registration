@@ -6,7 +6,7 @@ import RegistrationPage from './pages/Registration'
 import { PGlite } from '@electric-sql/pglite'
 import { PGliteProvider } from '@electric-sql/pglite-react'
 import { live } from '@electric-sql/pglite/live'
-
+import { createTableSchema } from './schema/postgres'
 // we need routes
 // - home Route
 // patient list route with add patient button
@@ -15,8 +15,10 @@ import { live } from '@electric-sql/pglite/live'
 
 const db = await PGlite.create({
   extensions: { live },
-  dataDir: 'idb://test-1'
+  dataDir: 'idb://test-4'
 })
+
+db.exec(createTableSchema.text)
 
 function App() {
   return (

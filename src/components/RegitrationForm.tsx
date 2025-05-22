@@ -1,16 +1,19 @@
+import { usePGlite } from '@electric-sql/pglite-react'
 import { DevTool } from '@hookform/devtools'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Camera, HelpCircle, X } from 'lucide-react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Button } from './ui/button'
 import PhotoDialog from './PhotoDialog'
+import { Button } from './ui/button'
+
+import { base64ToUint8Array } from '@/utils/helpers'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from './ui/tooltip'
-import { Camera, HelpCircle, X } from 'lucide-react'
 
 const keyValueSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -73,8 +76,74 @@ export default function RegistrationForm() {
     name: 'keyValuePairs'
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log('Form submitted:', data)
+  const db = usePGlite()
+
+  async function onSubmit(data: FormData) {
+    const {
+      registrationDateTime,
+      keyValuePairs,
+      firstName,
+      lastName,
+      sex,
+      dob,
+      phoneNumber,
+      email,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      postalCode,
+      reason,
+      additionalNotes,
+      patientHistory,
+      photo
+    } = data
+
+    const stmt = `
+  INSERT INTO patients (
+    registration_datetime,
+    key_value_pairs,
+    first_name,
+    last_name,
+    sex,
+    dob,
+    phone_number,
+    email,
+    address_line1,
+    address_line2,
+    city,
+    state,
+    postal_code,
+    reason,
+    additional_notes,
+    patient_history,
+    photo
+  ) VALUES (
+        '${registrationDateTime}',
+        ${keyValuePairs ? `'${JSON.stringify(keyValuePairs).replace(/'/g, "''")}'` : 'NULL'},
+
+     '${firstName}',
+    ${lastName ? `'${lastName}'` : 'NULL'},
+    '${sex}',
+    '${dob}',
+    '${phoneNumber}',
+    '${email}',
+    '${addressLine1}',
+    ${addressLine2 ? `'${addressLine2}'` : 'NULL'},
+    '${city}',
+    '${state}',
+    '${postalCode}',
+    '${reason}',
+    ${additionalNotes ? `'${additionalNotes}'` : 'NULL'},
+    ${patientHistory ? `'${patientHistory}'` : 'NULL'},
+    ${photo ? `'${base64ToUint8Array(photo)}'` : 'NULL'}
+  )`
+
+    await db.exec(stmt)
+
+    console.log('done inserted')
+    // const returnedData = await db.query(`SELECT * FROM patients;`)
+    // console.log('returned data', returnedData)
   }
 
   const addKeyValuePair = () => {
@@ -468,7 +537,7 @@ export default function RegistrationForm() {
             </label>
             <textarea
               id="additionalNotes"
-              {...register('additionalNotes')}
+              {...register('patientHistory')}
               className={`p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] ${
                 errors.patientHistory ? 'border-red-500' : ''
               }`}
