@@ -168,6 +168,16 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
+"@electric-sql/pglite-react@^0.2.19":
+  version "0.2.19"
+  resolved "https://registry.yarnpkg.com/@electric-sql/pglite-react/-/pglite-react-0.2.19.tgz#a3ab570631234f3a534d3938de3f6ac30046a20d"
+  integrity sha512-8T2lUI5b5KoHS4fyKou+ablyrdUvDmk+1J3xDFJmUrEj4YWMFh4FZKMdekdxgBU7LBW0erSv+viJ9apKQpxDQA==
+
+"@electric-sql/pglite@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@electric-sql/pglite/-/pglite-0.3.1.tgz#618dc6b9684e91f14e16f387a88053cdc211fd75"
+  integrity sha512-Kpbd2FMXnM5I56ZpMnGKZhv+h31ipeimgyJVb1C+nWFTikp33z0TTwmksEtHpPinuqKiMJblH2OJM0RubKvJgg==
+
 "@emnapi/core@^1.4.3":
   version "1.4.3"
   resolved "https://registry.yarnpkg.com/@emnapi/core/-/core-1.4.3.tgz#9ac52d2d5aea958f67e52c40a065f51de59b77d6"
@@ -2401,6 +2411,11 @@ source-map@^0.5.7:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
   integrity sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==
 
+sql-template-tag@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/sql-template-tag/-/sql-template-tag-5.2.1.tgz#e300dc157dbe51f08ce2ad696a7943529e55e1b0"
+  integrity sha512-lFdvXCOqWhV40A7w4oQVDyuaNFb5yO+dhsHStZzOdtDJWCBWYv4+hhATK5nPpY5v/T1OMVcLMPeN4519qIyb9Q==
+
 state-local@^1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/state-local/-/state-local-1.0.7.tgz#da50211d07f05748d53009bee46307a37db386d5"
@@ -2614,7 +2629,7 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zod@^3.24.4:
+zod@^3.25.13:
   version "3.25.13"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.13.tgz#53103b7eed402b2c7a0ad2f035acc34aab34526b"
   integrity sha512-Q8mvk2iWi7rTDfpQBsu4ziE7A6AxgzJ5hzRyRYQkoV3A3niYsXVwDaP1Kbz3nWav6S+VZ6k2OznFn8ZyDHvIrg==

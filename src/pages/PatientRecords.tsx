@@ -12,6 +12,8 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import type { PatientTable } from '@/schema/postgres'
+import { usePGlite } from '@electric-sql/pglite-react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Database, Search } from 'lucide-react'
@@ -35,11 +37,19 @@ export type Patient = PatientFormData & {
   id: number
 }
 
-function SqlQueryView() {
+function SqlQueryView({
+  setRecords
+}: {
+  setRecords: React.Dispatch<React.SetStateAction<PatientTable[]>>
+}) {
+  const db = usePGlite()
   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM patients LIMIT 10')
   const [isLoading] = useState(false)
 
-  const executeQuery = async (_query: string) => {}
+  const executeQuery = async (query: string) => {
+    const results = await db.query(query)
+    setRecords(results.rows as PatientTable[])
+  }
 
   return (
     <Card className="flex flex-col h-full">
@@ -142,12 +152,10 @@ function SimpleQueryView() {
   )
 }
 
-
-
 export default function PatientRecords() {
   const [, setLocation] = useLocation()
   const [, params] = useRoute('/patient-records/:queryType?')
-  const [patients] = useState<Patient[]>([])
+  const [records, setRecords] = useState<PatientTable[]>([])
 
   const isSqlMode = params?.queryType === 'sql'
 
@@ -171,10 +179,14 @@ export default function PatientRecords() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Left Panel - Query Interface */}
-        {isSqlMode ? <SqlQueryView /> : <SimpleQueryView />}
+        {isSqlMode ? (
+          <SqlQueryView setRecords={setRecords} />
+        ) : (
+          <SimpleQueryView />
+        )}
 
         {/* Right Panel - Results Table */}
-        <ResultsTable patients={patients} />
+        <ResultsTable patients={records} />
       </div>
     </div>
   )

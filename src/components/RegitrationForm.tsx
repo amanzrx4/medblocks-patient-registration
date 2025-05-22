@@ -1,16 +1,19 @@
+import { usePGlite } from '@electric-sql/pglite-react'
 import { DevTool } from '@hookform/devtools'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { Camera, HelpCircle, X } from 'lucide-react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Button } from './ui/button'
 import PhotoDialog from './PhotoDialog'
+import { Button } from './ui/button'
+
+import { base64ToHex } from '@/utils/helpers'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from './ui/tooltip'
-import { Camera, HelpCircle, X } from 'lucide-react'
 
 const keyValueSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -18,7 +21,9 @@ const keyValueSchema = z.object({
 })
 
 const formSchema = z.object({
-  registrationDateTime: z.string().min(1, 'Registration date is required'),
+  registrationDateTime: z
+    .string()
+    .datetime({ offset: true, message: 'Date time is required' }),
   keyValuePairs: z.array(keyValueSchema).optional(),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().optional(),
@@ -71,15 +76,79 @@ export default function RegistrationForm() {
     name: 'keyValuePairs'
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log('Form submitted:', data)
+  const db = usePGlite()
+
+  async function onSubmit(data: FormData) {
+    const {
+      registrationDateTime,
+      keyValuePairs,
+      firstName,
+      lastName,
+      sex,
+      dob,
+      phoneNumber,
+      email,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      postalCode,
+      reason,
+      additionalNotes,
+      patientHistory,
+      photo
+    } = data
+
+    const stmt = `
+  INSERT INTO patients (
+    registration_datetime,
+    key_value_pairs,
+    first_name,
+    last_name,
+    sex,
+    dob,
+    phone_number,
+    email,
+    address_line1,
+    address_line2,
+    city,
+    state,
+    postal_code,
+    reason,
+    additional_notes,
+    patient_history,
+    photo
+  ) VALUES (
+        '${registrationDateTime}',
+        ${keyValuePairs ? `'${JSON.stringify(keyValuePairs).replace(/'/g, "''")}'` : 'NULL'},
+
+     '${firstName}',
+    ${lastName ? `'${lastName}'` : 'NULL'},
+    '${sex}',
+    '${dob}',
+    '${phoneNumber}',
+    '${email}',
+    '${addressLine1}',
+    ${addressLine2 ? `'${addressLine2}'` : 'NULL'},
+    '${city}',
+    '${state}',
+    '${postalCode}',
+    '${reason}',
+    ${additionalNotes ? `'${additionalNotes}'` : 'NULL'},
+    ${patientHistory ? `'${patientHistory}'` : 'NULL'},
+    ${photo ? `'X${base64ToHex(photo)}'` : 'NULL'}  )`
+
+    await db.exec(stmt)
+
+    console.log('done inserted')
+    // const returnedData = await db.query(`SELECT * FROM patients;`)
+    // console.log('returned data', returnedData)
   }
 
   const addKeyValuePair = () => {
     append({ name: '', data: '' })
   }
 
-  console.log('errors', errors)
   return (
     <TooltipProvider>
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mb-10">
@@ -150,36 +219,51 @@ export default function RegistrationForm() {
               >
                 Registration Date & Time
               </label>
-              <div className="">
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="datetime-local"
-                    id="registrationDateTime"
-                    {...register('registrationDateTime')}
-                    className={`p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.registrationDateTime ? 'border-red-500' : ''
-                    }`}
-                  />
+              <Controller
+                control={control}
+                name="registrationDateTime"
+                defaultValue=""
+                render={({ field }) => {
+                  const displayValue = field.value
+                    ? field.value.slice(0, 16)
+                    : ''
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      const now = new Date()
-                      const unixTimestamp = Math.floor(now.getTime() / 1000)
-                      const formattedDateTime = new Date(unixTimestamp * 1000)
-                        .toISOString()
-                        .slice(0, 16)
+                  return (
+                    <div className="">
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="datetime-local"
+                          id="registrationDateTime"
+                          value={displayValue}
+                          onChange={(e) => {
+                            const val = e.target.value
 
-                      setValue('registrationDateTime', formattedDateTime)
-                    }}
-                    className=" text-medblocks-blue hover:text-medblocks-blue"
-                  >
-                    Now
-                  </Button>
-                </div>
-                {renderError(errors.registrationDateTime)}
-              </div>
+                            const isoTimestamp = new Date(val).toISOString()
+
+                            field.onChange(isoTimestamp)
+                          }}
+                          className={`p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            errors.registrationDateTime ? 'border-red-500' : ''
+                          }`}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => {
+                            const now = new Date().toISOString()
+                            // store full ISO but show sliced in input
+                            setValue('registrationDateTime', now)
+                          }}
+                          className="text-medblocks-blue hover:text-medblocks-blue"
+                        >
+                          Now
+                        </Button>
+                      </div>
+                      {renderError(errors.registrationDateTime)}
+                    </div>
+                  )
+                }}
+              />
             </div>
           </div>
 
@@ -452,7 +536,7 @@ export default function RegistrationForm() {
             </label>
             <textarea
               id="additionalNotes"
-              {...register('additionalNotes')}
+              {...register('patientHistory')}
               className={`p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] ${
                 errors.patientHistory ? 'border-red-500' : ''
               }`}
