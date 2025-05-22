@@ -7,7 +7,7 @@ import { z } from 'zod'
 import PhotoDialog from './PhotoDialog'
 import { Button } from './ui/button'
 
-import { base64ToUint8Array } from '@/utils/helpers'
+import { base64ToHex, base64ToUint8Array } from '@/utils/helpers'
 import {
   Tooltip,
   TooltipContent,
@@ -136,8 +136,7 @@ export default function RegistrationForm() {
     '${reason}',
     ${additionalNotes ? `'${additionalNotes}'` : 'NULL'},
     ${patientHistory ? `'${patientHistory}'` : 'NULL'},
-    ${photo ? `'${base64ToUint8Array(photo)}'` : 'NULL'}
-  )`
+    ${photo ? `'X${base64ToHex(photo)}'` : 'NULL'}  )`
 
     await db.exec(stmt)
 
