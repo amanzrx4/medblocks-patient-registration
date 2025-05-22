@@ -12,6 +12,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import type { PatientTable } from '@/schema/postgres'
 import { usePGlite } from '@electric-sql/pglite-react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -39,7 +40,7 @@ export type Patient = PatientFormData & {
 function SqlQueryView({
   setRecords
 }: {
-  setRecords: React.Dispatch<React.SetStateAction<unknown[]>>
+  setRecords: React.Dispatch<React.SetStateAction<PatientTable[]>>
 }) {
   const db = usePGlite()
   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM patients LIMIT 10')
@@ -47,7 +48,7 @@ function SqlQueryView({
 
   const executeQuery = async (query: string) => {
     const results = await db.query(query)
-    setRecords(results.rows)
+    setRecords(results.rows as PatientTable[])
   }
 
   return (
@@ -154,7 +155,7 @@ function SimpleQueryView() {
 export default function PatientRecords() {
   const [, setLocation] = useLocation()
   const [, params] = useRoute('/patient-records/:queryType?')
-  const [records, setRecords] = useState<unknown[]>([])
+  const [records, setRecords] = useState<PatientTable[]>([])
 
   const isSqlMode = params?.queryType === 'sql'
 

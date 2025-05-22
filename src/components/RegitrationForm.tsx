@@ -7,7 +7,7 @@ import { z } from 'zod'
 import PhotoDialog from './PhotoDialog'
 import { Button } from './ui/button'
 
-import { base64ToHex, base64ToUint8Array } from '@/utils/helpers'
+import { base64ToHex } from '@/utils/helpers'
 import {
   Tooltip,
   TooltipContent,

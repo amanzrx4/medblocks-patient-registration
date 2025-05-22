@@ -1,6 +1,7 @@
 import { PGlite } from '@electric-sql/pglite'
 import { PGliteProvider } from '@electric-sql/pglite-react'
-import { live } from '@electric-sql/pglite/live'
+import { live, type PGliteWithLive } from '@electric-sql/pglite/live'
+import { useEffect, useState } from 'react'
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
 import HomePage from './pages/Home'
@@ -13,14 +14,23 @@ import { createTableSchema } from './schema/postgres'
 // patient form route
 // patient query route
 
-const db = await PGlite.create({
-  extensions: { live },
-  dataDir: 'idb://test-4'
-})
-
-db.exec(createTableSchema.text)
-
 function App() {
+  const [db, setDb] = useState<PGliteWithLive>()
+
+  useEffect(() => {
+    PGlite.create({
+      extensions: { live },
+      dataDir: 'idb://test-4'
+    }).then((db) => {
+      setDb(db)
+      db.exec(createTableSchema.text)
+    })
+  }, [])
+
+  if (!db) {
+    return <h1>Initializing db</h1>
+  }
+
   return (
     <>
       <PGliteProvider db={db}>

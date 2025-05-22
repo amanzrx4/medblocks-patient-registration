@@ -11,7 +11,6 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { PatientTable } from '@/schema/postgres'
 import { uint8ArrayToDataURL } from '@/utils/helpers'
-import PatientDetailsDialog from './PatientDetailsDialog'
 
 export default function ResultsTable({
   patients
@@ -19,15 +18,13 @@ export default function ResultsTable({
   patients: PatientTable[]
 }) {
   const [error] = useState<string | null>(null)
-  const [selectedPatient, setSelectedPatient] = useState<PatientTable | null>(
-    null
-  )
+  const [, setSelectedPatient] = useState<PatientTable | null>(null)
 
-  const handleDialogOpenChange = (open: boolean) => {
-    if (!open) {
-      setSelectedPatient(null)
-    }
-  }
+  // const handleDialogOpenChange = (open: boolean) => {
+  //   if (!open) {
+  //     setSelectedPatient(null)
+  //   }
+  // }
 
   return (
     <Card className="flex flex-col h-full">
@@ -102,13 +99,13 @@ export default function ResultsTable({
         )}
       </CardContent>
 
-      {selectedPatient && (
+      {/* {selectedPatient && (
         <PatientDetailsDialog
           patient={selectedPatient}
           trigger={<div className="hidden" />}
           onOpenChange={handleDialogOpenChange}
         />
-      )}
+      )} */}
     </Card>
   )
 }
