@@ -9,7 +9,7 @@ import {
 import { useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { PatientTable } from '@/db/schema'
+import type { PatientTable } from '@/utils'
 import { uint8ArrayToDataURL } from '@/utils/helpers'
 
 export default function ResultsTable({
