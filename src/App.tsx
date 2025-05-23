@@ -1,17 +1,15 @@
 import { PGliteProvider } from '@electric-sql/pglite-react'
-import {
-  live,
-  type LiveNamespace
-} from '@electric-sql/pglite/live'
+import { live, type LiveNamespace } from '@electric-sql/pglite/live'
 import { PGliteWorker } from '@electric-sql/pglite/worker'
 import { useEffect, useRef, useState } from 'react'
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
 import TestComp from './components/TestComp'
+import { queries } from './db/queries'
 import HomePage from './pages/Home'
 import PatientRecords from './pages/PatientRecords'
 import RegistrationPage from './pages/Registration'
-
+import { DB_NAME } from './utils'
 
 export type PGliteWorkerWithLive = PGliteWorker & {
   live: LiveNamespace
@@ -23,8 +21,6 @@ export type PGliteWorkerWithLive = PGliteWorker & {
 // patient form route
 // patient query route
 
-export const db_name = 'test1'
-
 function App() {
   const [db, setDb] = useState<PGliteWorkerWithLive>()
   const hasInitialized = useRef(false)
@@ -34,7 +30,7 @@ function App() {
     hasInitialized.current = true
 
     // clear the db first
-    indexedDB.deleteDatabase(db_name)
+    indexedDB.deleteDatabase(`${DB_NAME}`)
     console.log('db deleted')
 
     const db = new PGliteWorker(
@@ -43,7 +39,7 @@ function App() {
       }),
 
       {
-        dataDir: 'idb://test1',
+        dataDir: `idb://${DB_NAME}`,
         extensions: {
           live
         }
@@ -51,23 +47,10 @@ function App() {
       // ducktaping since this type is not official exported
     ) as PGliteWorkerWithLive
 
-    console.log('db here', db)
-    // db.
-
-    setDb(db)
-
-    // PGlite.create({
-    //   extensions: { live },
-    //   dataDir: `idb://${db_name}`
-    // })
-    //   .then((db) => {
-    //     setDb(db)
-    //     // db.exec(`CREATE TABLE users (name TEXT);`)
-    //     console.log('db setted up')
-    //   })
-    //   .catch((e) => {
-    //     console.log('e', e)
-    //   })
+    db.exec(queries.prod.createTable).then(async () => {
+      setDb(db)
+      console.log('Db setup success')
+    })
   }, [])
 
   if (!db) {
