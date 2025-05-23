@@ -1,30 +1,73 @@
-import { PGlite } from '@electric-sql/pglite'
 import { PGliteProvider } from '@electric-sql/pglite-react'
-import { live, type PGliteWithLive } from '@electric-sql/pglite/live'
-import { useEffect, useState } from 'react'
+import {
+  live,
+  type LiveNamespace
+} from '@electric-sql/pglite/live'
+import { PGliteWorker } from '@electric-sql/pglite/worker'
+import { useEffect, useRef, useState } from 'react'
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
+import TestComp from './components/TestComp'
 import HomePage from './pages/Home'
 import PatientRecords from './pages/PatientRecords'
 import RegistrationPage from './pages/Registration'
-import { createTableSchema } from './schema/postgres'
+
+
+export type PGliteWorkerWithLive = PGliteWorker & {
+  live: LiveNamespace
+}
+
 // we need routes
 // - home Route
 // patient list route with add patient button
 // patient form route
 // patient query route
 
+export const db_name = 'test1'
+
 function App() {
-  const [db, setDb] = useState<PGliteWithLive>()
+  const [db, setDb] = useState<PGliteWorkerWithLive>()
+  const hasInitialized = useRef(false)
 
   useEffect(() => {
-    PGlite.create({
-      extensions: { live },
-      dataDir: 'idb://test-4'
-    }).then((db) => {
-      setDb(db)
-      db.exec(createTableSchema.text)
-    })
+    if (hasInitialized.current) return
+    hasInitialized.current = true
+
+    // clear the db first
+    indexedDB.deleteDatabase(db_name)
+    console.log('db deleted')
+
+    const db = new PGliteWorker(
+      new Worker(new URL('./my-pglite-worker.js', import.meta.url), {
+        type: 'module'
+      }),
+
+      {
+        dataDir: 'idb://test1',
+        extensions: {
+          live
+        }
+      }
+      // ducktaping since this type is not official exported
+    ) as PGliteWorkerWithLive
+
+    console.log('db here', db)
+    // db.
+
+    setDb(db)
+
+    // PGlite.create({
+    //   extensions: { live },
+    //   dataDir: `idb://${db_name}`
+    // })
+    //   .then((db) => {
+    //     setDb(db)
+    //     // db.exec(`CREATE TABLE users (name TEXT);`)
+    //     console.log('db setted up')
+    //   })
+    //   .catch((e) => {
+    //     console.log('e', e)
+    //   })
   }, [])
 
   if (!db) {
@@ -43,6 +86,10 @@ function App() {
         </Route>
         <Route path="/patient-records/:queryType?">
           <PatientRecords />
+        </Route>
+
+        <Route path="/test">
+          <TestComp />
         </Route>
       </PGliteProvider>
     </>
