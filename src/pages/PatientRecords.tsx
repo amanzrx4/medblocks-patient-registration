@@ -1,7 +1,7 @@
 import ResultsTable from '@/components/PatientResults'
 import type { FormData as PatientFormData } from '@/components/RegitrationForm'
-import SqlQueryView from '@/components/SimpleQueryView'
-import SimpleQueryView from '@/components/SqlQueryView'
+import SimpleQueryView from '@/components/SimpleQueryView'
+import SqlQueryView from '@/components/SqlQueryView'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import type { PatientTable, QueryStatus } from '@/utils'
@@ -23,6 +23,7 @@ export default function PatientRecords() {
   const isSqlMode = params?.queryType === 'sql'
 
   const handleQueryTypeChange = (isSqlMode: boolean) => {
+    // setRecords({ type: 'idle' }) -> not sure if we should do this?
     setLocation(`/patient-records/${isSqlMode ? 'sql' : 'simple'}`)
   }
 
