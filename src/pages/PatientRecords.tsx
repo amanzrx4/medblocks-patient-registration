@@ -12,7 +12,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import type { PatientTable } from '@/schema/postgres'
+import type { PatientTable } from '@/db/schema'
 import { usePGlite } from '@electric-sql/pglite-react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
