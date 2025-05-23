@@ -8,18 +8,17 @@ import {
 } from '@/components/ui/table'
 import { type QueryStatus } from '@/utils'
 import { useState } from 'react'
-import * as XLSX from 'xlsx'
 
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
-  CardTitle,
-  CardFooter
+  CardTitle
 } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import type { PatientTable } from '@/utils'
-import { uint8ArrayToDataURL } from '@/utils/helpers'
+import { excelExport, uint8ArrayToDataURL } from '@/utils/helpers'
 import { AlertCircle, Download, Loader } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 
@@ -28,7 +27,11 @@ function renderResultsTable(
   setSelectedPatient: React.Dispatch<React.SetStateAction<PatientTable | null>>
 ) {
   if (records.type === 'idle') {
-    return <h1>START QUERYING SOMETHING</h1>
+    return (
+      <div className="p-2 flex items-center justify-center">
+        <h1 className="font-bold">Start Querying</h1>
+      </div>
+    )
   }
 
   if (records.type === 'error') {
@@ -125,7 +128,6 @@ export default function ResultsTable({
 
     setIsExporting(true)
     try {
-      // Transform data for Excel
       const excelData = records.data.map((patient) => ({
         'First Name': patient.first_name,
         'Last Name': patient.last_name || '',
@@ -146,14 +148,7 @@ export default function ResultsTable({
         'Patient History': patient.patient_history || ''
       }))
 
-      // Create worksheet
-      const ws = XLSX.utils.json_to_sheet(excelData)
-      const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, 'Patients')
-
-      // Generate Excel file
-      const fileName = `patient_records_${new Date().toISOString().split('T')[0]}.xlsx`
-      XLSX.writeFile(wb, fileName)
+      excelExport(excelData)
     } catch (err) {
       console.error('Error exporting to Excel:', err)
     } finally {
