@@ -12,7 +12,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import type { PatientTable } from '@/utils'
+import type { PatientTable, QueryStatus } from '@/utils'
 import { usePGlite } from '@electric-sql/pglite-react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -38,17 +38,23 @@ export type Patient = PatientFormData & {
 }
 
 function SqlQueryView({
+  records,
   setRecords
 }: {
-  setRecords: React.Dispatch<React.SetStateAction<PatientTable[]>>
+  records: QueryStatus<PatientTable[]>
+  setRecords: React.Dispatch<React.SetStateAction<QueryStatus<PatientTable[]>>>
 }) {
   const db = usePGlite()
   const [sqlQuery, setSqlQuery] = useState('SELECT * FROM patients LIMIT 10')
-  const [isLoading] = useState(false)
 
   const executeQuery = async (query: string) => {
-    const results = await db.query(query)
-    setRecords(results.rows as PatientTable[])
+    setRecords({ type: 'loading' })
+    try {
+      const results = (await db.query(query)).rows as PatientTable[]
+      setRecords({ type: 'success', data: results })
+    } catch (error) {
+      setRecords({ type: 'error', error: error as Error })
+    }
   }
 
   return (
@@ -77,7 +83,7 @@ function SqlQueryView({
           </div>
           <Button
             onClick={() => executeQuery(sqlQuery)}
-            disabled={isLoading}
+            disabled={records.type === 'loading'}
             className="w-full flex-none"
           >
             Execute Query
@@ -155,7 +161,9 @@ function SimpleQueryView() {
 export default function PatientRecords() {
   const [, setLocation] = useLocation()
   const [, params] = useRoute('/patient-records/:queryType?')
-  const [records, setRecords] = useState<PatientTable[]>([])
+  const [records, setRecords] = useState<QueryStatus<PatientTable[]>>({
+    type: 'idle'
+  })
 
   const isSqlMode = params?.queryType === 'sql'
 
@@ -164,8 +172,8 @@ export default function PatientRecords() {
   }
 
   return (
-    <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
-      <div className="flex items-center justify-between mb-4">
+    <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between mb-4 flex-none">
         <h1 className="text-2xl font-bold">Patient Records</h1>
         <div className="flex items-center gap-2">
           <Label htmlFor="sql-mode">SQL Mode</Label>
@@ -177,16 +185,17 @@ export default function PatientRecords() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0 overflow-hidden">
         {/* Left Panel - Query Interface */}
         {isSqlMode ? (
-          <SqlQueryView setRecords={setRecords} />
+          <SqlQueryView records={records} setRecords={setRecords} />
         ) : (
           <SimpleQueryView />
         )}
 
-        {/* Right Panel - Results Table */}
-        <ResultsTable patients={records} />
+        <div className="h-full overflow-hidden">
+          <ResultsTable records={records} />
+        </div>
       </div>
     </div>
   )
