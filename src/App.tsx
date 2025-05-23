@@ -1,19 +1,12 @@
 import { PGliteProvider } from '@electric-sql/pglite-react'
-import { live, type LiveNamespace } from '@electric-sql/pglite/live'
-import { PGliteWorker } from '@electric-sql/pglite/worker'
 import { useEffect, useRef, useState } from 'react'
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
 import TestComp from './components/TestComp'
-import { queries } from './db/queries'
 import HomePage from './pages/Home'
 import PatientRecords from './pages/PatientRecords'
 import RegistrationPage from './pages/Registration'
-import { DB_NAME } from './utils'
-
-export type PGliteWorkerWithLive = PGliteWorker & {
-  live: LiveNamespace
-}
+import { dbSetUp, type PGliteWorkerWithLive } from '@/utils'
 
 // we need routes
 // - home Route
@@ -29,25 +22,11 @@ function App() {
     if (hasInitialized.current) return
     hasInitialized.current = true
 
-    // clear the db first
-    indexedDB.deleteDatabase(`${DB_NAME}`)
-    console.log('db deleted')
+    // // clear the db first
+    // indexedDB.deleteDatabase(`${DB_NAME}`)
+    // console.log('db deleted')
 
-    const db = new PGliteWorker(
-      new Worker(new URL('./my-pglite-worker.js', import.meta.url), {
-        type: 'module'
-      }),
-
-      {
-        dataDir: `idb://${DB_NAME}`,
-        extensions: {
-          live
-        }
-      }
-      // ducktaping since this type is not official exported
-    ) as PGliteWorkerWithLive
-
-    db.exec(queries.prod.createTable).then(async () => {
+    dbSetUp().then(async (db) => {
       setDb(db)
       console.log('Db setup success')
     })

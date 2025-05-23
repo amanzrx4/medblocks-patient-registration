@@ -1,4 +1,4 @@
-import type { PGliteWorkerWithLive } from '@/App'
+import type { PGliteWorkerWithLive } from '@/utils'
 import { faker } from '@faker-js/faker'
 
 export async function seedData(count: number, db: PGliteWorkerWithLive) {

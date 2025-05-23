@@ -1,3 +1,9 @@
+import { PGliteWorker } from '@electric-sql/pglite/worker'
+import { DB_NAME } from '@/utils'
+import { live } from '@electric-sql/pglite/live'
+import { queries } from '@/db/queries'
+import type { PGliteWorkerWithLive } from '@/utils'
+
 export function base64ToUint8Array(base64String: Base64URLString) {
   const base64Data = base64String.split(',')[1]
 
@@ -30,4 +36,24 @@ export function base64ToHex(base64String: string) {
   }
 
   return hex
+}
+
+export async function dbSetUp() {
+  const db = new PGliteWorker(
+    new Worker(new URL('/src/my-pglite-worker.js', import.meta.url), {
+      type: 'module'
+    }),
+
+    {
+      dataDir: `idb://${DB_NAME}`,
+      extensions: {
+        live
+      }
+    }
+    // ducktaping since this type is not official exported
+  ) as PGliteWorkerWithLive
+
+  await db.exec(queries.prod.createTable)
+
+  return db
 }

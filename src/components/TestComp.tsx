@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { seedData } from '@/db/seed'
-import type { PGliteWorkerWithLive } from '@/App'
+import type { PGliteWorkerWithLive } from '@/utils'
 
 export default function TestComp() {
   const db = usePGlite() as PGliteWorkerWithLive
