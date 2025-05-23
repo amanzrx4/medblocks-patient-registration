@@ -13,5 +13,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['@electric-sql/pglite']
+  },
+  worker: {
+    // https://github.com/vitejs/vite/issues/18585#issuecomment-2458919919
+    format: 'es'
   }
 })
