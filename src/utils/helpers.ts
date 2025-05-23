@@ -3,6 +3,7 @@ import { DB_NAME } from '@/utils'
 import { live } from '@electric-sql/pglite/live'
 import { queries } from '@/db/queries'
 import type { PGliteWorkerWithLive } from '@/utils'
+import * as XLSX from 'xlsx'
 
 export function base64ToUint8Array(base64String: Base64URLString) {
   const base64Data = base64String.split(',')[1]
@@ -56,4 +57,13 @@ export async function dbSetUp() {
   await db.exec(queries.prod.createTable)
 
   return db
+}
+
+export async function excelExport<T>(data: T[]) {
+  const ws = XLSX.utils.json_to_sheet(data)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Patients')
+
+  const fileName = `patient_records_${new Date().toISOString().split('T')[0]}.xlsx`
+  XLSX.writeFile(wb, fileName)
 }

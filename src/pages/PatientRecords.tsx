@@ -16,7 +16,7 @@ import type { PatientTable, QueryStatus } from '@/utils'
 import { usePGlite } from '@electric-sql/pglite-react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Database, Search } from 'lucide-react'
+import { Database, Loader2, Search } from 'lucide-react'
 import { lazy, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLocation, useRoute } from 'wouter'
@@ -27,11 +27,31 @@ const Editor = lazy(() =>
 )
 
 const querySchema = z.object({
-  searchType: z.enum(['name', 'email']),
+  searchType: z.enum([
+    'first_name',
+    'last_name',
+    'email',
+    'phone_number',
+    'city',
+    'state',
+    'postal_code',
+    'reason'
+  ]),
   searchValue: z.string().min(1, 'Search value is required')
 })
 
 type QueryFormData = z.infer<typeof querySchema>
+
+const searchOptions = [
+  { value: 'first_name', label: 'First Name' },
+  { value: 'last_name', label: 'Last Name' },
+  { value: 'email', label: 'Email' },
+  { value: 'phone_number', label: 'Phone Number' },
+  { value: 'city', label: 'City' },
+  { value: 'state', label: 'State' },
+  { value: 'postal_code', label: 'Postal Code' },
+  { value: 'reason', label: 'Reason' }
+] as const
 
 export type Patient = PatientFormData & {
   id: number
@@ -94,18 +114,44 @@ function SqlQueryView({
   )
 }
 
-function SimpleQueryView() {
-  const [isLoading] = useState(false)
-  // const [patients] = useState<Patient[]>([])
+function SimpleQueryView({
+  setRecords
+}: {
+  records: QueryStatus<PatientTable[]>
+  setRecords: React.Dispatch<React.SetStateAction<QueryStatus<PatientTable[]>>>
+}) {
+  const [isLoading, setIsLoading] = useState(false)
+  const db = usePGlite()
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm<QueryFormData>({
-    resolver: zodResolver(querySchema)
+    resolver: zodResolver(querySchema),
+    defaultValues: {
+      searchType: 'first_name'
+    }
   })
 
-  const onSubmit = async (_data: QueryFormData) => {}
+  const onSubmit = async (data: QueryFormData) => {
+    setIsLoading(true)
+    setRecords({ type: 'loading' })
+    try {
+      // case-insensitive search
+      const query = `
+        SELECT * FROM patients 
+        WHERE ${data.searchType}::text ILIKE $1 
+        ORDER BY registration_datetime DESC
+      `
+      const results = (await db.query(query, [`%${data.searchValue}%`]))
+        .rows as PatientTable[]
+      setRecords({ type: 'success', data: results })
+    } catch (error) {
+      setRecords({ type: 'error', error: error as Error })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <Card className="flex flex-col h-full">
@@ -122,13 +168,16 @@ function SimpleQueryView() {
         >
           <div className="space-y-2 flex-none">
             <Label htmlFor="searchType">Search By</Label>
-            <Select {...register('searchType')} defaultValue="name">
+            <Select {...register('searchType')} defaultValue="first_name">
               <SelectTrigger>
                 <SelectValue placeholder="Select search type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
+                {searchOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -138,6 +187,7 @@ function SimpleQueryView() {
               id="searchValue"
               {...register('searchValue')}
               placeholder="Enter search value..."
+              disabled={isLoading}
             />
             {errors.searchValue && (
               <p className="text-sm text-red-500">
@@ -150,7 +200,14 @@ function SimpleQueryView() {
             disabled={isLoading}
             className="w-full flex-none"
           >
-            Search
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Searching...
+              </>
+            ) : (
+              'Search'
+            )}
           </Button>
         </form>
       </CardContent>
@@ -174,7 +231,7 @@ export default function PatientRecords() {
   return (
     <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <div className="flex items-center justify-between mb-4 flex-none">
-        <h1 className="text-2xl font-bold">Patient Records</h1>
+        <h1 className="text-2xl font-bold">Patient Records Search</h1>
         <div className="flex items-center gap-2">
           <Label htmlFor="sql-mode">SQL Mode</Label>
           <Switch
@@ -190,7 +247,7 @@ export default function PatientRecords() {
         {isSqlMode ? (
           <SqlQueryView records={records} setRecords={setRecords} />
         ) : (
-          <SimpleQueryView />
+          <SimpleQueryView records={records} setRecords={setRecords} />
         )}
 
         <div className="h-full overflow-hidden">
