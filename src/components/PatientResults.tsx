@@ -9,7 +9,7 @@ import {
 import { useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { PatientTable } from '@/schema/postgres'
+import type { PatientTable } from '@/db/schema'
 import { uint8ArrayToDataURL } from '@/utils/helpers'
 
 export default function ResultsTable({
@@ -49,7 +49,7 @@ export default function ResultsTable({
               <TableBody>
                 {patients.map((patient) => {
                   const patientPhotoSrc =
-                    patient && uint8ArrayToDataURL(patient.photo!)
+                    patient.photo && uint8ArrayToDataURL(patient.photo!)
 
                   return (
                     <TableRow
