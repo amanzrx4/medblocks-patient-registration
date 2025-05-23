@@ -1,13 +1,13 @@
-import { PGlite } from '@electric-sql/pglite'
 import { PGliteProvider } from '@electric-sql/pglite-react'
-import { live, type PGliteWithLive } from '@electric-sql/pglite/live'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Route } from 'wouter'
 import Navbar from './components/Navbar'
+import TestComp from './components/TestComp'
 import HomePage from './pages/Home'
 import PatientRecords from './pages/PatientRecords'
 import RegistrationPage from './pages/Registration'
-import { createTableSchema } from './schema/postgres'
+import { dbSetUp, type PGliteWorkerWithLive } from '@/utils'
+
 // we need routes
 // - home Route
 // patient list route with add patient button
@@ -15,15 +15,20 @@ import { createTableSchema } from './schema/postgres'
 // patient query route
 
 function App() {
-  const [db, setDb] = useState<PGliteWithLive>()
+  const [db, setDb] = useState<PGliteWorkerWithLive>()
+  const hasInitialized = useRef(false)
 
   useEffect(() => {
-    PGlite.create({
-      extensions: { live },
-      dataDir: 'idb://test-4'
-    }).then((db) => {
+    if (hasInitialized.current) return
+    hasInitialized.current = true
+
+    // // clear the db first
+    // indexedDB.deleteDatabase(`${DB_NAME}`)
+    // console.log('db deleted')
+
+    dbSetUp().then(async (db) => {
       setDb(db)
-      db.exec(createTableSchema.text)
+      console.log('Db setup success')
     })
   }, [])
 
@@ -43,6 +48,10 @@ function App() {
         </Route>
         <Route path="/patient-records/:queryType?">
           <PatientRecords />
+        </Route>
+
+        <Route path="/test">
+          <TestComp />
         </Route>
       </PGliteProvider>
     </>

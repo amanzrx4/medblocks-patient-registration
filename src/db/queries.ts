@@ -1,6 +1,12 @@
-import sql from 'sql-template-tag'
-
-export const createTableSchema = sql`CREATE TABLE IF NOT EXISTS patients (
+export const queries = {
+  test: {
+    createTable: `CREATE TABLE IF NOT EXISTS users (name TEXT);`,
+    insertData: `INSERT INTO users (name) VALUES ('Alice')`,
+    selectAll: `SELECT * FROM users;`
+  },
+  prod: {
+    selectAll: `SELECT * FROM patients;`,
+    createTable: `CREATE TABLE IF NOT EXISTS patients (
     id SERIAL PRIMARY KEY,
     registration_datetime TIMESTAMPTZ NOT NULL,
     -- keyvalue pair for saving some additional data
@@ -26,25 +32,5 @@ export const createTableSchema = sql`CREATE TABLE IF NOT EXISTS patients (
     photo BYTEA CHECK (octet_length(photo) <= 5 * 1024 * 1024),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );`
-
-export type PatientTable = {
-  id?: number
-  registration_datetime: string // ISO string
-  key_value_pairs?: Record<string, any>
-  first_name: string
-  last_name?: string
-  sex: 'male' | 'female' | 'other'
-  dob: string // 'YYYY-MM-DD'
-  phone_number: string
-  email: string
-  address_line1: string
-  address_line2?: string
-  city: string
-  state: string
-  postal_code: string
-  reason: string
-  additional_notes?: string
-  patient_history?: string
-  photo?: Uint8Array
-  created_at?: string
+  }
 }

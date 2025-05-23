@@ -79,27 +79,29 @@ export default function RegistrationForm() {
   const db = usePGlite()
 
   async function onSubmit(data: FormData) {
-    const {
-      registrationDateTime,
-      keyValuePairs,
-      firstName,
-      lastName,
-      sex,
-      dob,
-      phoneNumber,
-      email,
-      addressLine1,
-      addressLine2,
-      city,
-      state,
-      postalCode,
-      reason,
-      additionalNotes,
-      patientHistory,
-      photo
-    } = data
+   const {
+     registrationDateTime,
+     keyValuePairs,
+     firstName,
+     lastName,
+     sex,
+     dob,
+     phoneNumber,
+     email,
+     addressLine1,
+     addressLine2,
+     city,
+     state,
+     postalCode,
+     reason,
+     additionalNotes,
+     patientHistory,
+     photo
+   } = data
 
-    const stmt = `
+   const photoHex = photo ? '\\x' + base64ToHex(photo) : null
+
+   const stmt = `
   INSERT INTO patients (
     registration_datetime,
     key_value_pairs,
@@ -119,26 +121,33 @@ export default function RegistrationForm() {
     patient_history,
     photo
   ) VALUES (
-        '${registrationDateTime}',
-        ${keyValuePairs ? `'${JSON.stringify(keyValuePairs).replace(/'/g, "''")}'` : 'NULL'},
+    $1, $2, $3, $4, $5, $6, $7, $8,
+    $9, $10, $11, $12, $13, $14, $15, $16, $17
+  )
+`
 
-     '${firstName}',
-    ${lastName ? `'${lastName}'` : 'NULL'},
-    '${sex}',
-    '${dob}',
-    '${phoneNumber}',
-    '${email}',
-    '${addressLine1}',
-    ${addressLine2 ? `'${addressLine2}'` : 'NULL'},
-    '${city}',
-    '${state}',
-    '${postalCode}',
-    '${reason}',
-    ${additionalNotes ? `'${additionalNotes}'` : 'NULL'},
-    ${patientHistory ? `'${patientHistory}'` : 'NULL'},
-    ${photo ? `'X${base64ToHex(photo)}'` : 'NULL'}  )`
+   const values = [
+     registrationDateTime,
+     keyValuePairs ? JSON.stringify(keyValuePairs) : null,
+     firstName,
+     lastName || null,
+     sex,
+     dob,
+     phoneNumber,
+     email,
+     addressLine1,
+     addressLine2 || null,
+     city,
+     state,
+     postalCode,
+     reason,
+     additionalNotes || null,
+     patientHistory || null,
+     photoHex
+   ]
 
-    await db.exec(stmt)
+   await db.query(stmt, values)
+
 
     console.log('done inserted')
     // const returnedData = await db.query(`SELECT * FROM patients;`)
