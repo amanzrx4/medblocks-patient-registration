@@ -52,7 +52,7 @@ function renderResultsTable(
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border p-2">
       <Table>
         <TableHeader className="sticky top-0 bg-background z-10">
           <TableRow>
