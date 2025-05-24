@@ -14,7 +14,7 @@ const menuItems = [
   },
   {
     name: 'Patient Records',
-    href: '/patient-records'
+    href: '/patient-records/sql'
   }
 ] as const
 

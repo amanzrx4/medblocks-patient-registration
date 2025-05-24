@@ -36,32 +36,12 @@ export default function Home() {
                 Patient Records
               </h3>
               <p className="text-gray-600 mt-1">
-                View and manage existing patient records
+                View and query existing patient records
               </p>
               <code className="mt-2 inline-block bg-gray-100 px-3 py-1 rounded text-sm font-mono text-gray-800">
-                /patient-records
-              </code>
-            </div>
-
-            <div className="border-l-4 border-purple-500 pl-4 py-2">
-              <h3 className="text-lg font-medium text-gray-800">
-                Appointments
-              </h3>
-              <p className="text-gray-600 mt-1">
-                Schedule and manage patient appointments
-              </p>
-              <code className="mt-2 inline-block bg-gray-100 px-3 py-1 rounded text-sm font-mono text-gray-800">
-                /appointments
-              </code>
-            </div>
-
-            <div className="border-l-4 border-yellow-500 pl-4 py-2">
-              <h3 className="text-lg font-medium text-gray-800">Reports</h3>
-              <p className="text-gray-600 mt-1">
-                Generate and view patient and system reports
-              </p>
-              <code className="mt-2 inline-block bg-gray-100 px-3 py-1 rounded text-sm font-mono text-gray-800">
-                /reports
+                /patient-records/sql
+                <br />
+                /patient-records/simple
               </code>
             </div>
           </div>
