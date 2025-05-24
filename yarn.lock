@@ -2466,11 +2466,6 @@ source-map@^0.5.7:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
   integrity sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==
 
-sql-template-tag@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/sql-template-tag/-/sql-template-tag-5.2.1.tgz#e300dc157dbe51f08ce2ad696a7943529e55e1b0"
-  integrity sha512-lFdvXCOqWhV40A7w4oQVDyuaNFb5yO+dhsHStZzOdtDJWCBWYv4+hhATK5nPpY5v/T1OMVcLMPeN4519qIyb9Q==
-
 ssf@~0.11.2:
   version "0.11.2"
   resolved "https://registry.yarnpkg.com/ssf/-/ssf-0.11.2.tgz#0b99698b237548d088fc43cdf2b70c1a7512c06c"
