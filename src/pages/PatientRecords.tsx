@@ -3,7 +3,7 @@ import type { FormData as PatientFormData } from '@/components/RegitrationForm'
 import SimpleQueryView from '@/components/SimpleQueryView'
 import SqlQueryView from '@/components/SqlQueryView'
 import SwitchQuery from '@/components/SwitchQuery'
-import { LiveQueryProvider } from '@/hooks/LiveQueryProvider'
+import { LiveQueryProvider } from '@/providers/LiveQueryProvider'
 import { useRoute } from 'wouter'
 
 export type Patient = PatientFormData & {

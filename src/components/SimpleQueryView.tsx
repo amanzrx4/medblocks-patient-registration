@@ -1,5 +1,5 @@
 import { Label } from '@/components/ui/label'
-import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
+import { useLiveQueryProvider } from '@/providers/LiveQueryProvider'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, Search } from 'lucide-react'
 import { useForm } from 'react-hook-form'

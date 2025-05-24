@@ -1,4 +1,4 @@
-import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
+import { useLiveQueryProvider } from '@/providers/LiveQueryProvider'
 import { Database } from 'lucide-react'
 import { lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from './ui/button'

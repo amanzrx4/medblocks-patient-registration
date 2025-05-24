@@ -1,8 +1,8 @@
 import type { QueryObj } from '@/pages/PatientRecords'
 import type { PatientTable } from '@/utils'
 import { createContext, type ReactNode, useContext, useState } from 'react'
-import type { UseLiveQueryResult } from './useLiveQuery'
-import useLiveQuery from './useLiveQuery'
+import type { UseLiveQueryResult } from '../hooks/useLiveQuery'
+import useLiveQuery from '../hooks/useLiveQuery'
 
 type LiveQueryContextValue<T> = {
   queryObj: QueryObj

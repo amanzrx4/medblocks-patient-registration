@@ -1,4 +1,4 @@
-import { useLiveQueryContext } from '@/hooks/LiveQueryProvider'
+import { useLiveQueryContext } from '@/providers/LiveQueryProvider'
 import { useLocation } from 'wouter'
 import { Label } from './ui/label'
 import { Switch } from './ui/switch'
@@ -15,7 +15,7 @@ export default function SwitchQuery({ isSqlMode }: SwitchQueryProps) {
     setLocation(`/patient-records/${isSqlMode ? 'sql' : 'simple'}`)
 
     // this will reset the query on switch
-    setQueryObj({ params: [], query: "" })
+    setQueryObj({ params: [], query: '' })
   }
 
   return (

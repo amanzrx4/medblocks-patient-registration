@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
+import { useLiveQueryProvider } from '@/providers/LiveQueryProvider'
 import type { UseLiveQueryResult } from '@/hooks/useLiveQuery'
 import type { PatientTable } from '@/utils'
 import {
