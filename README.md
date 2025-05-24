@@ -1,54 +1,120 @@
-# React + TypeScript + Vite
+# Medblocks Patient Registration System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+https://medblocks-patient-registration.netlify.app
 
-Currently, two official plugins are available:
+A modern web application for managing patient registrations and records
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Built With
 
-## Expanding the ESLint configuration
+- **Frontend Framework**: React + TypeScript
+- **Build Tool**: Vite
+- **Database**: Electric SQL (PGlite) - SQLite in the browser
+- **UI Components**: Shadcn and Tailwind CSS
+- **Form Handling**: React Hook Form with Zod validation
+- **Routing**: Wouter for lightweight routing
+- **Data Export**: xlsx for Excel exports
+- **Query Editor**: monaco editor for sql query playground
+- **Data Table**: tanstack table for rendering table results
+- **Icons**: lucide-react
+- **Image Capture**: react-webcam
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## ✨ Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname
-    }
-  }
-})
+- 📝 Patient registration with comprehensive form
+- 📸 Photo capture/upload capability
+- 🔍 Advanced patient search with SQL and simple query modes
+- 📊 Detailed patient records view
+- 📱 Responsive design for mobile and desktop
+- 📤 Export patient data to Excel
+- 🔒 Browser-based data storage
+- 🎨 Modern, clean UI with dark mode support
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/medblocks-patient-registration.git
+cd medblocks-patient-registration
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Install dependencies:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules
-  }
-})
+```bash
+npm install
+# or
+yarn install
 ```
+
+3. Start the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## 💻 Usage
+
+### Patient Registration
+
+1. Navigate to "Patient Registration" from the menu
+2. Fill in the patient details including:
+   - Basic information (name, sex, DOB)
+   - Contact details (phone, email)
+   - Address information
+   - Medical history and reason for registration
+3. Optionally add a patient/receipt photo
+4. Submit the form to register the patient
+
+### Patient Records
+
+1. Go to "Patient Records" from the menu
+2. Choose between:
+   - **Simple Search**: Quick search by specific fields
+   - **SQL Mode**: Advanced search using SQL queries
+3. View patient details by clicking on any record
+4. Export records to Excel using the export button
+
+## 🔧 Development
+
+### Project Structure
+
+```
+src/
+├── components/     # React components
+├── hooks/         # Custom React hooks
+├── pages/         # Page components
+├── utils/         # Utility functions
+└── providers/     # react context providers
+
+└── utils/         # all utils like     types, helper fn, constants
+
+└── db/           # Database queries and setup
+└── my-pglite-worker.js     # pglite worker
+
+└── image-test     # a project i created to test image upload functionality with pglite, this dir is not included in the build
+```
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run clean-install` - Clean install deps
+
+## 📝 Notes
+
+- Data is stored locally in the browser using PGlite
+- Photos are stored as binary data
+- The application works offline after initial load
+- All form validations are performed client-side
