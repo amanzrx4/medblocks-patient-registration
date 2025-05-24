@@ -37,7 +37,7 @@ export default function PhotoDialog({
 }: PhotoDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState<'upload' | 'capture'>('upload')
-  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>()
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
