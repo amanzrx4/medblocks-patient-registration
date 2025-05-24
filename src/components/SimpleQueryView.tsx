@@ -42,8 +42,8 @@ const searchOptions = [
   { value: 'reason', label: 'Reason' }
 ] as const
 
-export default function SimpleQueryView({}: {}) {
-  const { queryResult, setQueryObj, queryObj } = useLiveQueryProvider()
+export default function SimpleQueryView() {
+  const { queryResult, setQueryObj } = useLiveQueryProvider()
 
   const queryStatus = queryResult.status
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 const Editor = lazy(() =>
   import('@monaco-editor/react').then((mod) => ({ default: mod.Editor }))
 )
-export default function SqlQueryView({}: {}) {
+export default function SqlQueryView() {
   const { queryObj, queryResult, setQueryObj } = useLiveQueryProvider()
 
   const queryStatus = queryResult.status

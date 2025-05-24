@@ -125,7 +125,7 @@ function renderResultsTable(
   }
 }
 
-export default function ResultsTable({}: {}) {
+export default function ResultsTable() {
   const { queryResult } = useLiveQueryProvider()
   const [error] = useState<string | null>(null)
   const [, setSelectedPatient] = useState<PatientTable | null>(null)
