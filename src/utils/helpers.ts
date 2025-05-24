@@ -60,7 +60,7 @@ export async function dbSetUp() {
         live
       }
     }
-    // ducktaping since this type is not official exported
+    // ducktaping since this type is not officially exported
   ) as PGliteWorkerWithLive
 
   await db.exec(queries.prod.createTable)
