@@ -26,6 +26,7 @@ import {
 } from '@/utils/helpers'
 import { AlertCircle, Download, Loader } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
+import PatientDetailsDialog from './PatientDetailsDialog'
 
 function renderResultsTable(
   queryResult: UseLiveQueryResult<PatientTable>,
@@ -128,7 +129,9 @@ function renderResultsTable(
 export default function ResultsTable() {
   const { queryResult } = useLiveQueryProvider()
   const [error] = useState<string | null>(null)
-  const [, setSelectedPatient] = useState<PatientTable | null>(null)
+  const [selectedPatient, setSelectedPatient] = useState<PatientTable | null>(
+    null
+  )
   const [isExporting, setIsExporting] = useState(false)
 
   const records = queryResult.data?.rows || []
@@ -168,44 +171,54 @@ export default function ResultsTable() {
   }
 
   return (
-    <Card className="flex flex-col h-full">
-      <CardHeader className="flex-none">
-        <CardTitle>Results</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 min-h-0 overflow-hidden">
-        {error ? (
-          <div className="p-4 bg-red-50 text-red-500 rounded-md">{error}</div>
-        ) : (
-          <div className="h-full overflow-auto">
-            {renderResultsTable(queryResult, setSelectedPatient)}
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex-none border-t p-4">
-        <Button
-          onClick={handleExport}
-          disabled={
-            records.length === 0
-            // records.type !== 'success' ||
-            // records.data.length === 0 ||
-            // isExporting
-          }
-          className="w-full"
-          variant="outline"
-        >
-          {isExporting ? (
-            <>
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
-              Exporting...
-            </>
+    <>
+      {selectedPatient && (
+        <PatientDetailsDialog
+          patient={selectedPatient}
+          onOpenChange={(open) => {
+            if (!open) setSelectedPatient(null)
+          }}
+        />
+      )}
+      <Card className="flex flex-col h-full">
+        <CardHeader className="flex-none">
+          <CardTitle>Results</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 min-h-0 overflow-hidden">
+          {error ? (
+            <div className="p-4 bg-red-50 text-red-500 rounded-md">{error}</div>
           ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" />
-              Export to Excel
-            </>
+            <div className="h-full overflow-auto">
+              {renderResultsTable(queryResult, setSelectedPatient)}
+            </div>
           )}
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter className="flex-none border-t p-4">
+          <Button
+            onClick={handleExport}
+            disabled={
+              records.length === 0
+              // records.type !== 'success' ||
+              // records.data.length === 0 ||
+              // isExporting
+            }
+            className="w-full"
+            variant="outline"
+          >
+            {isExporting ? (
+              <>
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                Exporting...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Export to Excel
+              </>
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+    </>
   )
 }

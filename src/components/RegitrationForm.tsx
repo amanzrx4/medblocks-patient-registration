@@ -640,7 +640,7 @@ export default function RegistrationForm() {
                   <label className="text-sm font-medium text-gray-700 mb-1 block">
                     Data
                   </label>
-                  <textarea
+                  <input
                     {...register(`keyValuePairs.${index}.data` as const)}
                     className="p-2 border border-gray-300 rounded-md w-full"
                     placeholder="Enter Data"
