@@ -41,7 +41,7 @@ A modern web application for managing patient registrations and records
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/medblocks-patient-registration.git
+git clone https://github.com/amanzrx4/medblocks-patient-registration.git
 cd medblocks-patient-registration
 ```
 
