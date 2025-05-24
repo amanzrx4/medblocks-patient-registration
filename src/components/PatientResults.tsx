@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { type QueryStatus } from '@/utils'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -17,16 +16,18 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
+import type { UseLiveQueryResult } from '@/hooks/useLiveQuery'
 import type { PatientTable } from '@/utils'
 import { excelExport, uint8ArrayToDataURL } from '@/utils/helpers'
 import { AlertCircle, Download, Loader } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 
 function renderResultsTable(
-  records: QueryStatus<PatientTable[]>,
+  queryResult: UseLiveQueryResult<PatientTable>,
   setSelectedPatient: React.Dispatch<React.SetStateAction<PatientTable | null>>
 ) {
-  if (records.type === 'idle') {
+  if (queryResult.status === 'idle') {
     return (
       <div className="p-2 flex items-center justify-center">
         <h1 className="font-bold">Start Querying</h1>
@@ -34,16 +35,16 @@ function renderResultsTable(
     )
   }
 
-  if (records.type === 'error') {
+  if (queryResult.status === 'error') {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{records.error.message}</AlertDescription>
+        <AlertDescription>{queryResult.error!.message}</AlertDescription>
       </Alert>
     )
   }
 
-  if (records.type === 'loading') {
+  if (queryResult.status === 'loading') {
     return (
       <div className="flex items-center justify-center p-2">
         <Loader className="animate-spin" />
@@ -51,84 +52,87 @@ function renderResultsTable(
     )
   }
 
-  return (
-    <div className="rounded-md border p-2">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background z-10">
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Registration Date</TableHead>
-            <TableHead>Photo</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {records.data.map((patient) => {
-            const patientPhotoSrc =
-              patient.photo && uint8ArrayToDataURL(patient.photo!)
+  if (queryResult.status === 'success') {
+    return (
+      <div className="rounded-md border p-2">
+        <Table>
+          <TableHeader className="sticky top-0 bg-background z-10">
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Registration Date</TableHead>
+              <TableHead>Photo</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {queryResult.data!.rows.map((patient) => {
+              const patientPhotoSrc =
+                patient.photo && uint8ArrayToDataURL(patient.photo!)
 
-            return (
-              <TableRow
-                key={patient.id}
-                className="cursor-pointer hover:bg-gray-50"
-                onClick={() => setSelectedPatient(patient)}
-              >
-                <TableCell>
-                  {patient.first_name} {patient.last_name}
-                </TableCell>
-                <TableCell>{patient.email}</TableCell>
-                <TableCell>{patient.phone_number}</TableCell>
-                <TableCell>
-                  {new Date(patient.registration_datetime).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {patient.photo ? (
-                    <img
-                      className="w-10 h-10 rounded-full object-cover"
-                      src={patientPhotoSrc}
-                      alt={`${patient.first_name} ${patient.last_name || ''}`}
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400 text-xs">
-                        {patient.first_name[0]}
-                        {patient.last_name?.[0] || ''}
-                      </span>
-                    </div>
-                  )}
+              return (
+                <TableRow
+                  key={patient.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => setSelectedPatient(patient)}
+                >
+                  <TableCell>
+                    {patient.first_name} {patient.last_name}
+                  </TableCell>
+                  <TableCell>{patient.email}</TableCell>
+                  <TableCell>{patient.phone_number}</TableCell>
+                  <TableCell>
+                    {new Date(patient.registration_datetime)
+                      .getDate()
+                      .toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    {patient.photo ? (
+                      <img
+                        className="w-10 h-10 rounded-full object-cover"
+                        src={patientPhotoSrc}
+                        alt={`${patient.first_name} ${patient.last_name || ''}`}
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">
+                          {patient.first_name}
+                          {patient.last_name || ''}
+                        </span>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+            {queryResult.data!.rows.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-4">
+                  No patients found
                 </TableCell>
               </TableRow>
-            )
-          })}
-          {records.data.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
-                No patients found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  )
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    )
+  }
 }
 
-export default function ResultsTable({
-  records
-}: {
-  records: QueryStatus<PatientTable[]>
-}) {
+export default function ResultsTable({}: {}) {
+  const { queryResult } = useLiveQueryProvider()
   const [error] = useState<string | null>(null)
   const [, setSelectedPatient] = useState<PatientTable | null>(null)
   const [isExporting, setIsExporting] = useState(false)
 
+  const records = queryResult.data?.rows || []
+
   const handleExport = () => {
-    if (records.type !== 'success' || records.data.length === 0) return
+    // if (records.type !== 'success' || records.length === 0) return
 
     setIsExporting(true)
     try {
-      const excelData = records.data.map((patient) => ({
+      const excelData = records.map((patient) => ({
         'First Name': patient.first_name,
         'Last Name': patient.last_name || '',
         Email: patient.email,
@@ -166,7 +170,7 @@ export default function ResultsTable({
           <div className="p-4 bg-red-50 text-red-500 rounded-md">{error}</div>
         ) : (
           <div className="h-full overflow-auto">
-            {renderResultsTable(records, setSelectedPatient)}
+            {renderResultsTable(queryResult, setSelectedPatient)}
           </div>
         )}
       </CardContent>
@@ -174,9 +178,10 @@ export default function ResultsTable({
         <Button
           onClick={handleExport}
           disabled={
-            records.type !== 'success' ||
-            records.data.length === 0 ||
-            isExporting
+            records.length === 0
+            // records.type !== 'success' ||
+            // records.data.length === 0 ||
+            // isExporting
           }
           className="w-full"
           variant="outline"
