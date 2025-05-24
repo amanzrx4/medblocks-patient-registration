@@ -28,10 +28,12 @@ export default function PatientRecords() {
           <SwitchQuery isSqlMode={isSqlMode} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0 overflow-hidden">
-          {isSqlMode ? <SqlQueryView /> : <SimpleQueryView />}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
+          <div className="min-h-0 overflow-auto">
+            {isSqlMode ? <SqlQueryView /> : <SimpleQueryView />}
+          </div>
 
-          <div className="h-full overflow-hidden">
+          <div className="min-h-0 overflow-auto">
             <ResultsTable />
           </div>
         </div>
