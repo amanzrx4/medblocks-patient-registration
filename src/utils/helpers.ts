@@ -18,7 +18,7 @@ export function base64ToUint8Array(base64String: Base64URLString) {
   return bytes
 }
 
-export function uint8ArrayToBase64(bytes: Uint8Array) {
+function uint8ArrayToBase64(bytes: Uint8Array) {
   let binary = ''
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i])
@@ -29,19 +29,6 @@ export function uint8ArrayToBase64(bytes: Uint8Array) {
 export function uint8ArrayToDataURL(bytes: Uint8Array, mime = 'image/jpg') {
   const base64 = uint8ArrayToBase64(bytes)
   return `data:${mime};base64,${base64}`
-}
-
-export function base64ToHex(base64String: string) {
-  const base64Data = base64String.split(',')[1]
-  const binaryString = atob(base64Data)
-
-  let hex = ''
-  for (let i = 0; i < binaryString.length; i++) {
-    const hexByte = binaryString.charCodeAt(i).toString(16).padStart(2, '0')
-    hex += hexByte
-  }
-
-  return hex
 }
 
 export async function imageEncodeUint8Array(file: File) {
@@ -76,4 +63,12 @@ export async function excelExport<T>(data: T[]) {
 
   const fileName = `patient_records_${new Date().toISOString().split('T')[0]}.xlsx`
   XLSX.writeFile(wb, fileName)
+}
+
+export function getFormattedDate(dt: Date) {
+  const now = new Date(dt)
+  const date = now.getDate().toLocaleString()
+  const day = now.getDay().toLocaleString()
+  const year = now.getFullYear()
+  return `${date}/${day}/${year}`
 }

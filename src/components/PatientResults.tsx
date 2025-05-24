@@ -19,7 +19,11 @@ import {
 import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
 import type { UseLiveQueryResult } from '@/hooks/useLiveQuery'
 import type { PatientTable } from '@/utils'
-import { excelExport, uint8ArrayToDataURL } from '@/utils/helpers'
+import {
+  excelExport,
+  getFormattedDate,
+  uint8ArrayToDataURL
+} from '@/utils/helpers'
 import { AlertCircle, Download, Loader } from 'lucide-react'
 import { Alert, AlertDescription } from './ui/alert'
 
@@ -58,6 +62,7 @@ function renderResultsTable(
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
+              <TableHead>INDEX</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -66,9 +71,13 @@ function renderResultsTable(
             </TableRow>
           </TableHeader>
           <TableBody>
-            {queryResult.data!.rows.map((patient) => {
+            {queryResult.data!.rows.map((patient, idx) => {
               const patientPhotoSrc =
                 patient.photo && uint8ArrayToDataURL(patient.photo!)
+
+              const formattedDate = getFormattedDate(
+                new Date(patient.registration_datetime)
+              )
 
               return (
                 <TableRow
@@ -76,16 +85,13 @@ function renderResultsTable(
                   className="cursor-pointer hover:bg-gray-50"
                   onClick={() => setSelectedPatient(patient)}
                 >
+                  <TableCell>{idx + 1}</TableCell>
                   <TableCell>
                     {patient.first_name} {patient.last_name}
                   </TableCell>
                   <TableCell>{patient.email}</TableCell>
                   <TableCell>{patient.phone_number}</TableCell>
-                  <TableCell>
-                    {new Date(patient.registration_datetime)
-                      .getDate()
-                      .toLocaleString()}
-                  </TableCell>
+                  <TableCell>{formattedDate}</TableCell>
                   <TableCell>
                     {patient.photo ? (
                       <img
@@ -96,8 +102,8 @@ function renderResultsTable(
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                         <span className="text-gray-400 text-xs">
-                          {patient.first_name}
-                          {patient.last_name || ''}
+                          {patient.first_name[0]}
+                          {patient.last_name?.[0] || ''}
                         </span>
                       </div>
                     )}
