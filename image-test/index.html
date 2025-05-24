@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Photo Upload</title>
+    <script type="module">
+      import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js'
+
+      console.log('pglite', PGlite)
+      window.PGlite = PGlite
+
+      let db
+      const form = document.getElementById('uploadForm')
+      const photosDiv = document.getElementById('photos')
+
+      async function initDB() {
+        try {
+          db = new window.PGlite('idb://photo-db')
+          console.log('✅ PGlite initialized with IndexedDB')
+
+          await db.exec(`
+                    CREATE TABLE IF NOT EXISTS photos (
+                        id SERIAL PRIMARY KEY,
+                        photo BYTEA NOT NULL
+                    )
+                `)
+          console.log('Table created')
+
+          loadPhotos()
+        } catch (err) {
+          console.error('DB init failed:', err)
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const file = document.getElementById('photoInput').files[0]
+
+        if (!file) return
+
+        console.log('Processing file:', file.name, file.type, file.size)
+
+        try {
+          const arrayBuffer = await file.arrayBuffer()
+          const uint8Array = new Uint8Array(arrayBuffer)
+
+          console.log('🔍 Binary data size:', uint8Array.length)
+
+          const query = `
+  INSERT INTO photos (
+    photo
+  ) VALUES (
+    $1
+  );
+`
+          const values = [uint8Array]
+
+          await db.query(query, values)
+          console.log('Photo stored in PGlite')
+
+          loadPhotos()
+          document.getElementById('photoInput').value = ''
+        } catch (err) {
+          console.error('Upload failed:', err)
+        }
+      })
+
+      async function loadPhotos() {
+        if (!db) return
+
+        try {
+          const result = await db.query(
+            'SELECT id, photo FROM photos ORDER BY id DESC'
+          )
+          console.log(`📋 Retrieved ${result} ${result.rows.length} photos`)
+
+          photosDiv.innerHTML = ''
+          result.rows.forEach((row) => {
+            const img = document.createElement('img')
+            const base64 = btoa(String.fromCharCode(...row.photo))
+            img.src = `data:image/jpeg;base64,${base64}`
+            img.style.width = '200px'
+            img.style.margin = '10px'
+            photosDiv.appendChild(img)
+          })
+          console.log('Photos rendered')
+        } catch (err) {
+          console.error('Load failed:', err)
+        }
+      }
+
+      initDB()
+    </script>
+  </head>
+  <body>
+    <h1>Photo Upload</h1>
+
+    <form id="uploadForm">
+      <input type="file" id="photoInput" accept="image/*" required />
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="photos"></div>
+  </body>
+</html>
