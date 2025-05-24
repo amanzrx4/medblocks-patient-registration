@@ -21,9 +21,10 @@ export default function SqlQueryView() {
     // @ts-ignore
     const query = editorRef.current!.getValue() as any as string
 
-
     setQueryObj((e) => ({ ...e, query }))
   }
+
+  const defaultValue = `-- Start writing some SQL queries, like SELECT * FROM patients LIMIT 10`
 
   return (
     <Card className="flex flex-col h-full">
@@ -37,6 +38,7 @@ export default function SqlQueryView() {
         <div className="flex flex-col flex-1 min-h-0 space-y-4">
           <div className="flex-1 min-h-0 border rounded-md overflow-hidden">
             <Editor
+              defaultValue={defaultValue}
               // ref={editorRef}
               height="100%"
               language="sql"

@@ -65,3 +65,8 @@ export function getFormattedDate(dt: Date) {
   const year = now.getFullYear()
   return `${date}/${day}/${year}`
 }
+
+
+export function scrollToTop(){
+  document.body.scrollTop = document.documentElement.scrollTop = 0
+}

@@ -62,7 +62,7 @@ function renderResultsTable(
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              <TableHead>INDEX</TableHead>
+              <TableHead>Index</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>

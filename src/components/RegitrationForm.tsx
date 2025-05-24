@@ -6,8 +6,10 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import PhotoDialog from './PhotoDialog'
 import { Button } from './ui/button'
+import { Alert, AlertDescription, AlertTitle } from './ui/alert'
+import { useState } from 'react'
 
-import { uint8ArrayToDataURL } from '@/utils'
+import { scrollToTop, uint8ArrayToDataURL } from '@/utils'
 import {
   Tooltip,
   TooltipContent,
@@ -51,14 +53,27 @@ const formSchema = z.object({
 
 export type FormData = z.infer<typeof formSchema>
 
+type AlertState = {
+  show: boolean
+  type: 'success' | 'error'
+  message: string
+}
+
 export default function RegistrationForm() {
+  const [alert, setAlert] = useState<AlertState>({
+    show: false,
+    type: 'success',
+    message: ''
+  })
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     control,
-    watch
+    watch,
+    reset
   } = useForm<FormData>({
     resolver: zodResolver(formSchema)
   })
@@ -79,76 +94,94 @@ export default function RegistrationForm() {
   const db = usePGlite()
 
   async function onSubmit(data: FormData) {
-    const {
-      registrationDateTime,
-      keyValuePairs,
-      firstName,
-      lastName,
-      sex,
-      dob,
-      phoneNumber,
-      email,
-      addressLine1,
-      addressLine2,
-      city,
-      state,
-      postalCode,
-      reason,
-      additionalNotes,
-      patientHistory,
-      photo
-    } = data
+    try {
+      const {
+        registrationDateTime,
+        keyValuePairs,
+        firstName,
+        lastName,
+        sex,
+        dob,
+        phoneNumber,
+        email,
+        addressLine1,
+        addressLine2,
+        city,
+        state,
+        postalCode,
+        reason,
+        additionalNotes,
+        patientHistory,
+        photo
+      } = data
 
-    const stmt = `
-  INSERT INTO patients (
-    registration_datetime,
-    key_value_pairs,
-    first_name,
-    last_name,
-    sex,
-    dob,
-    phone_number,
-    email,
-    address_line1,
-    address_line2,
-    city,
-    state,
-    postal_code,
-    reason,
-    additional_notes,
-    patient_history,
-    photo
-  ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8,
-    $9, $10, $11, $12, $13, $14, $15, $16, $17
-  )
-`
+      const stmt = `
+        INSERT INTO patients (
+          registration_datetime,
+          key_value_pairs,
+          first_name,
+          last_name,
+          sex,
+          dob,
+          phone_number,
+          email,
+          address_line1,
+          address_line2,
+          city,
+          state,
+          postal_code,
+          reason,
+          additional_notes,
+          patient_history,
+          photo
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          $9, $10, $11, $12, $13, $14, $15, $16, $17
+        )
+      `
 
-    const values = [
-      registrationDateTime,
-      keyValuePairs ? JSON.stringify(keyValuePairs) : null,
-      firstName,
-      lastName || null,
-      sex,
-      dob,
-      phoneNumber,
-      email,
-      addressLine1,
-      addressLine2 || null,
-      city,
-      state,
-      postalCode,
-      reason,
-      additionalNotes || null,
-      patientHistory || null,
-      photo || null
-    ]
+      const values = [
+        registrationDateTime,
+        keyValuePairs ? JSON.stringify(keyValuePairs) : null,
+        firstName,
+        lastName || null,
+        sex,
+        dob,
+        phoneNumber,
+        email,
+        addressLine1,
+        addressLine2 || null,
+        city,
+        state,
+        postalCode,
+        reason,
+        additionalNotes || null,
+        patientHistory || null,
+        photo || null
+      ]
 
-    await db.query(stmt, values)
+      await db.query(stmt, values)
 
-    console.log('done inserted')
-    // const returnedData = await db.query(`SELECT * FROM patients;`)
-    // console.log('returned data', returnedData)
+      setAlert({
+        show: true,
+        type: 'success',
+        message: 'Patient registered successfully!'
+      })
+
+      scrollToTop()
+
+      reset()
+    } catch (error) {
+      setAlert({
+        show: true,
+        type: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to register patient. Please try again.'
+      })
+      scrollToTop()
+    }
   }
 
   const addKeyValuePair = () => {
@@ -158,6 +191,18 @@ export default function RegistrationForm() {
   return (
     <TooltipProvider>
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mb-10">
+        {alert.show && (
+          <Alert
+            className={`mb-4 ${alert.type === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}
+            variant={alert.type === 'success' ? 'default' : 'destructive'}
+          >
+            <AlertTitle>
+              {alert.type === 'success' ? 'Success' : 'Error'}
+            </AlertTitle>
+            <AlertDescription>{alert.message}</AlertDescription>
+          </Alert>
+        )}
+
         <h2 className="text-2xl font-semibold text-gray-800 mb-6">
           Patient Registration
         </h2>
@@ -639,7 +684,7 @@ export default function RegistrationForm() {
           </div>
         </form>
       </div>
-      <DevTool control={control} /> {/* set up the dev tool */}
+      <DevTool control={control} />
     </TooltipProvider>
   )
 }
