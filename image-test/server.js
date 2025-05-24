@@ -5,7 +5,7 @@ const path = require('path')
 const app = express()
 
 const pool = new Pool({
-  user: "postgres",
+  user: 'postgres',
   host: 'localhost',
   database: 'postgres',
   password: '',

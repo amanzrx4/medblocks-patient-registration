@@ -7,13 +7,13 @@ import { z } from 'zod'
 import PhotoDialog from './PhotoDialog'
 import { Button } from './ui/button'
 
+import { uint8ArrayToDataURL } from '@/utils'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from './ui/tooltip'
-import { uint8ArrayToDataURL } from '@/utils'
 
 const keyValueSchema = z.object({
   name: z.string().min(1, 'Name is required'),
