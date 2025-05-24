@@ -1,5 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger
+} from '@/components/ui/sheet'
 import { MEDBLOCKS_LOGO_URL_X } from '@/utils'
 import { Link } from 'wouter'
 
@@ -29,19 +34,20 @@ export default function Navbar() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left">
-          <Link href="#" className="mr-6 hidden lg:flex">
+          <Link href="/" className="mr-6 hidden lg:flex">
             <img src={MEDBLOCKS_LOGO_URL_X} alt="medblocks" />
             <span className="sr-only">Medblocks</span>
           </Link>
           <div className="grid gap-2 py-6 ml-2">
             {menuItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="flex w-full items-center py-2 text-lg font-semibold"
-              >
-                {item.name}
-              </Link>
+              <SheetClose asChild key={item.href}>
+                <Link
+                  href={item.href}
+                  className="flex w-full items-center py-2 text-lg font-semibold"
+                >
+                  {item.name}
+                </Link>
+              </SheetClose>
             ))}
           </div>
         </SheetContent>
