@@ -46,7 +46,7 @@ const formSchema = z.object({
   reason: z.string().min(1, 'Reason for registration is required'),
   additionalNotes: z.string().optional(),
   patientHistory: z.string().optional(),
-  photo: z.unknown().optional()
+  photo: z.custom((e) => e instanceof Uint8Array).optional()
 })
 
 export type FormData = z.infer<typeof formSchema>
