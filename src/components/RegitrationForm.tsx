@@ -99,9 +99,6 @@ export default function RegistrationForm() {
       photo
     } = data
 
-    //  const photoToStore =
-    //  const photoHex = photo ? '\\x' + base64ToHex(photo) : null
-
     const stmt = `
   INSERT INTO patients (
     registration_datetime,
@@ -301,7 +298,7 @@ export default function RegistrationForm() {
                 htmlFor="lastName"
                 className="text-sm font-medium text-gray-700 mb-1"
               >
-                Last Name
+                Last Name (Optional)
               </label>
               <input
                 type="text"
@@ -522,7 +519,7 @@ export default function RegistrationForm() {
               htmlFor="additionalNotes"
               className="text-sm font-medium text-gray-700 mb-1"
             >
-              Additional Notes
+              Additional Notes (Optional)
             </label>
             <textarea
               id="additionalNotes"
@@ -538,13 +535,13 @@ export default function RegistrationForm() {
           {/* Patient history */}
           <div className="flex flex-col">
             <label
-              htmlFor="additionalNotes"
+              htmlFor="patientHistory"
               className="text-sm font-medium text-gray-700 mb-1"
             >
-              Patient history
+              Patient History (Optional)
             </label>
             <textarea
-              id="additionalNotes"
+              id="patientHistory"
               {...register('patientHistory')}
               className={`p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] ${
                 errors.patientHistory ? 'border-red-500' : ''
@@ -557,7 +554,7 @@ export default function RegistrationForm() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-700">
-                Additional Information
+                Additional Information (Optional)
               </h3>
             </div>
 

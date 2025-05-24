@@ -26,3 +26,21 @@ export type PatientTable = {
   photo?: Uint8Array
   created_at?: string
 }
+
+export type QueryStatus<T> =
+  | {
+      type: 'idle'
+    }
+  | {
+      type: 'loading'
+    }
+  | {
+      type: 'error'
+      error: Error
+    }
+  | {
+      type: 'success'
+      data: T
+    }
+
+export type SuccessQueryData<T> = Extract<QueryStatus<T>, { type: 'success' }>['data']
