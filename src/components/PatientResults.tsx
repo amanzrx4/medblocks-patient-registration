@@ -138,7 +138,8 @@ export default function ResultsTable() {
 
     setIsExporting(true)
     try {
-      const excelData = records.map((patient) => ({
+      const excelData = records.map((patient, idx) => ({
+        Index: idx + 1,
         'First Name': patient.first_name,
         'Last Name': patient.last_name || '',
         Email: patient.email,
