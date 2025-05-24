@@ -1,8 +1,8 @@
-import { PGliteWorker } from '@electric-sql/pglite/worker'
-import { DB_NAME } from '@/utils'
-import { live } from '@electric-sql/pglite/live'
 import { queries } from '@/db/queries'
 import type { PGliteWorkerWithLive } from '@/utils'
+import { DB_NAME } from '@/utils'
+import { live } from '@electric-sql/pglite/live'
+import { PGliteWorker } from '@electric-sql/pglite/worker'
 
 export function base64ToUint8Array(base64String: Base64URLString) {
   const base64Data = base64String.split(',')[1]
@@ -17,14 +17,19 @@ export function base64ToUint8Array(base64String: Base64URLString) {
   return bytes
 }
 
-export function uint8ArrayToDataURL(bytes: Uint8Array, mime = 'image/jpg') {
+export function uint8ArrayToBase64(bytes: Uint8Array) {
   let binary = ''
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i])
   }
-  const base64 = btoa(binary)
+  return btoa(binary)
+}
+
+export function uint8ArrayToDataURL(bytes: Uint8Array, mime = 'image/jpg') {
+  const base64 = uint8ArrayToBase64(bytes)
   return `data:${mime};base64,${base64}`
 }
+
 export function base64ToHex(base64String: string) {
   const base64Data = base64String.split(',')[1]
   const binaryString = atob(base64Data)
@@ -36,6 +41,11 @@ export function base64ToHex(base64String: string) {
   }
 
   return hex
+}
+
+export async function imageEncodeUint8Array(file: File) {
+  const arrayBuffer = await file.arrayBuffer()
+  return new Uint8Array(arrayBuffer)
 }
 
 export async function dbSetUp() {
