@@ -11,13 +11,11 @@ import { useEffect, useState } from 'react'
 
 interface PatientDetailsDialogProps {
   patient: PatientTable
-  trigger?: React.ReactNode
   onOpenChange?: (open: boolean) => void
 }
 
 export default function PatientDetailsDialog({
   patient,
-  trigger,
   onOpenChange
 }: PatientDetailsDialogProps) {
   const [open, setOpen] = useState(true)
