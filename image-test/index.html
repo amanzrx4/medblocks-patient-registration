@@ -15,7 +15,7 @@
       async function initDB() {
         try {
           db = new window.PGlite('idb://photo-db')
-          console.log('✅ PGlite initialized with IndexedDB')
+          console.log('PGlite initialized with IndexedDB')
 
           await db.exec(`
                     CREATE TABLE IF NOT EXISTS photos (
@@ -43,7 +43,7 @@
           const arrayBuffer = await file.arrayBuffer()
           const uint8Array = new Uint8Array(arrayBuffer)
 
-          console.log('🔍 Binary data size:', uint8Array.length)
+          console.log('Binary data size:', uint8Array.length)
 
           const query = `
   INSERT INTO photos (
@@ -71,7 +71,7 @@
           const result = await db.query(
             'SELECT id, photo FROM photos ORDER BY id DESC'
           )
-          console.log(`📋 Retrieved ${result} ${result.rows.length} photos`)
+          console.log(`Retrieved ${result} ${result.rows.length} photos`)
 
           photosDiv.innerHTML = ''
           result.rows.forEach((row) => {
