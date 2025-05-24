@@ -25,6 +25,7 @@ export function uint8ArrayToDataURL(bytes: Uint8Array, mime = 'image/jpg') {
   const base64 = btoa(binary)
   return `data:${mime};base64,${base64}`
 }
+
 export function base64ToHex(base64String: string) {
   const base64Data = base64String.split(',')[1]
   const binaryString = atob(base64Data)
@@ -57,3 +58,23 @@ export async function dbSetUp() {
 
   return db
 }
+
+export function webcamToUint8Array(dataUrl: string): Uint8Array {
+  const base64 = dataUrl.split(',')[1]
+
+  const binaryString = atob(base64)
+
+  const bytes = new Uint8Array(binaryString.length)
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
+  }
+
+  return bytes
+}
+
+
+export async function imageEncodeUint8Array(file: File) {
+  const arrayBuffer = await file.arrayBuffer()
+  return new Uint8Array(arrayBuffer)
+}
+

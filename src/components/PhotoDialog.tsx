@@ -11,14 +11,25 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { imageEncodeUint8Array, webcamToUint8Array } from '@/utils'
 import { AlertCircle, Camera, Upload, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import Webcam from 'react-webcam'
 
 type PhotoDialogProps = {
-  onPhotoCapture: (photo: string) => void
+  onPhotoCapture: (photo: Uint8Array) => void
   trigger: React.ReactNode
 }
+
+type SelectedFile =
+  | {
+      type: 'webcam'
+      file: string
+    }
+  | {
+      type: 'upload'
+      file: File
+    }
 
 export default function PhotoDialog({
   onPhotoCapture,
@@ -26,7 +37,7 @@ export default function PhotoDialog({
 }: PhotoDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState<'upload' | 'capture'>('upload')
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>()
   const [preview, setPreview] = useState<string | null>(null)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -35,7 +46,7 @@ export default function PhotoDialog({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setSelectedFile(file)
+      setSelectedFile({ file, type: 'upload' })
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreview(reader.result as string)
@@ -47,17 +58,31 @@ export default function PhotoDialog({
   const handleCapture = useCallback(() => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot()
+
       if (imageSrc) {
+        // const imageUint8Array = webcamToUint8Array(imageSrc)
         setPreview(imageSrc)
-        onPhotoCapture(imageSrc)
-        setIsOpen(false)
+        setSelectedFile({ type: 'webcam', file: imageSrc })
+        // onPhotoCapture(imageUint8Array)
+        // setIsOpen(false)
       }
     }
   }, [webcamRef, onPhotoCapture])
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    // only here call the onPhotoCapture to return the photo back to main component
     if (selectedFile && preview) {
-      onPhotoCapture(preview)
+      let img: Uint8Array
+
+      if (selectedFile.type === 'upload') {
+        img = await imageEncodeUint8Array(selectedFile.file)
+      } else {
+        img = webcamToUint8Array(selectedFile.file)
+      }
+      onPhotoCapture(img)
+      setIsOpen(false)
+      setPreview(null)
+      setCameraError(null)
       setIsOpen(false)
     }
   }
@@ -209,12 +234,7 @@ export default function PhotoDialog({
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          {mode === 'upload' && preview && (
-            <Button onClick={handleConfirm}>Confirm</Button>
-          )}
-          {mode === 'capture' && preview && (
-            <Button onClick={() => onPhotoCapture(preview)}>Use Photo</Button>
-          )}
+          {preview && <Button onClick={handleConfirm}>Confirm</Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>
