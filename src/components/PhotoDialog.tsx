@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { imageEncodeUint8Array, webcamToUint8Array } from '@/utils'
+import { imageEncodeUint8Array, base64ToUint8Array } from '@/utils'
 import { AlertCircle, Camera, Upload, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import Webcam from 'react-webcam'
@@ -77,7 +77,7 @@ export default function PhotoDialog({
       if (selectedFile.type === 'upload') {
         img = await imageEncodeUint8Array(selectedFile.file)
       } else {
-        img = webcamToUint8Array(selectedFile.file)
+        img = base64ToUint8Array(selectedFile.file)
       }
       onPhotoCapture(img)
       setIsOpen(false)
