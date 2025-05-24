@@ -7,14 +7,11 @@ import { PGliteWorker } from '@electric-sql/pglite/worker'
 
 export function base64ToUint8Array(base64String: Base64URLString) {
   const base64Data = base64String.split(',')[1]
-
   const binaryString = atob(base64Data)
-
   const bytes = new Uint8Array(binaryString.length)
   for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i)
   }
-
   return bytes
 }
 
@@ -41,7 +38,6 @@ export async function dbSetUp() {
     new Worker(new URL('/src/my-pglite-worker.js', import.meta.url), {
       type: 'module'
     }),
-
     {
       dataDir: `idb://${DB_NAME}`,
       extensions: {
@@ -50,9 +46,7 @@ export async function dbSetUp() {
     }
     // ducktaping since this type is not officially exported
   ) as PGliteWorkerWithLive
-
   await db.exec(queries.prod.createTable)
-
   return db
 }
 
@@ -60,7 +54,6 @@ export async function excelExport<T>(data: T[]) {
   const ws = XLSX.utils.json_to_sheet(data)
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Patients')
-
   const fileName = `patient_records_${new Date().toISOString().split('T')[0]}.xlsx`
   XLSX.writeFile(wb, fileName)
 }
