@@ -7,13 +7,13 @@ import { z } from 'zod'
 import PhotoDialog from './PhotoDialog'
 import { Button } from './ui/button'
 
-import { base64ToHex } from '@/utils/helpers'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from './ui/tooltip'
+import { uint8ArrayToDataURL } from '@/utils'
 
 const keyValueSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -46,7 +46,7 @@ const formSchema = z.object({
   reason: z.string().min(1, 'Reason for registration is required'),
   additionalNotes: z.string().optional(),
   patientHistory: z.string().optional(),
-  photo: z.string().optional()
+  photo: z.custom((e) => e instanceof Uint8Array).optional()
 })
 
 export type FormData = z.infer<typeof formSchema>
@@ -63,7 +63,7 @@ export default function RegistrationForm() {
     resolver: zodResolver(formSchema)
   })
 
-  const photo = watch('photo')
+  const photo = watch('photo') as Uint8Array
 
   function renderError(error: (typeof errors)[keyof typeof errors]) {
     return error ? (
@@ -98,8 +98,6 @@ export default function RegistrationForm() {
       patientHistory,
       photo
     } = data
-
-    const photoHex = photo ? '\\x' + base64ToHex(photo) : null
 
     const stmt = `
   INSERT INTO patients (
@@ -143,7 +141,7 @@ export default function RegistrationForm() {
       reason,
       additionalNotes || null,
       patientHistory || null,
-      photoHex
+      photo || null
     ]
 
     await db.query(stmt, values)
@@ -200,7 +198,7 @@ export default function RegistrationForm() {
               {photo && (
                 <div className="relative w-24 h-24">
                   <img
-                    src={photo}
+                    src={uint8ArrayToDataURL(photo)}
                     alt="Patient"
                     className="w-full h-full object-cover rounded-lg"
                   />
@@ -209,7 +207,7 @@ export default function RegistrationForm() {
                     variant="destructive"
                     size="icon"
                     className="absolute -top-2 -right-2 w-6 h-6"
-                    onClick={() => setValue('photo', '')}
+                    onClick={() => setValue('photo', null)}
                   >
                     <X className="w-4 h-4" />
                   </Button>
