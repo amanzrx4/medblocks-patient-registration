@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { imageEncodeUint8Array, base64ToUint8Array } from '@/utils'
+import { base64ToUint8Array, imageEncodeUint8Array } from '@/utils'
 import { AlertCircle, Camera, Upload, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import Webcam from 'react-webcam'

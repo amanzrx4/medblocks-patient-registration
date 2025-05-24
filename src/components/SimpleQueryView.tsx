@@ -1,21 +1,19 @@
-import type { QueryStatus, PatientTable } from '@/utils'
-import { usePGlite } from '@electric-sql/pglite-react'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { Label } from '@/components/ui/label'
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
-  SelectItem
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select'
-import { Search, Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2, Search } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { Button } from './ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card'
-import { Input } from './ui/input'
 import { z } from 'zod'
-import { Label } from '@/components/ui/label'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Input } from './ui/input'
 
 const querySchema = z.object({
   searchType: z.enum([
@@ -44,14 +42,11 @@ const searchOptions = [
   { value: 'reason', label: 'Reason' }
 ] as const
 
-export default function SimpleQueryView({
-  setRecords
-}: {
-  records: QueryStatus<PatientTable[]>
-  setRecords: React.Dispatch<React.SetStateAction<QueryStatus<PatientTable[]>>>
-}) {
-  const [isLoading, setIsLoading] = useState(false)
-  const db = usePGlite()
+export default function SimpleQueryView() {
+  const { queryResult, setQueryObj } = useLiveQueryProvider()
+
+  const queryStatus = queryResult.status
+
   const {
     register,
     handleSubmit,
@@ -64,23 +59,16 @@ export default function SimpleQueryView({
   })
 
   const onSubmit = async (data: QueryFormData) => {
-    setIsLoading(true)
-    setRecords({ type: 'loading' })
-    try {
-      // case-insensitive search
-      const query = `
+    // case-insensitive search
+    const query = `
         SELECT * FROM patients 
         WHERE ${data.searchType}::text ILIKE $1 
         ORDER BY registration_datetime DESC
       `
-      const results = (await db.query(query, [`%${data.searchValue}%`]))
-        .rows as PatientTable[]
-      setRecords({ type: 'success', data: results })
-    } catch (error) {
-      setRecords({ type: 'error', error: error as Error })
-    } finally {
-      setIsLoading(false)
-    }
+
+    const params = [`%${data.searchValue}%`]
+
+    setQueryObj({ query, params })
   }
 
   return (
@@ -117,7 +105,7 @@ export default function SimpleQueryView({
               id="searchValue"
               {...register('searchValue')}
               placeholder="Enter search value..."
-              disabled={isLoading}
+              disabled={queryStatus === 'loading'}
             />
             {errors.searchValue && (
               <p className="text-sm text-red-500">
@@ -127,10 +115,10 @@ export default function SimpleQueryView({
           </div>
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={queryStatus === 'loading'}
             className="w-full flex-none"
           >
-            {isLoading ? (
+            {queryStatus === 'loading' ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Searching...

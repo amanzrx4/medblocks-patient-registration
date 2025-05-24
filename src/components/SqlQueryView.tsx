@@ -1,31 +1,28 @@
-import type { QueryStatus, PatientTable } from '@/utils'
-import { usePGlite } from '@electric-sql/pglite-react'
+import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
 import { Database } from 'lucide-react'
-import { lazy, useState } from 'react'
+import { lazy, useRef } from 'react'
 import { Button } from './ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 
 const Editor = lazy(() =>
   import('@monaco-editor/react').then((mod) => ({ default: mod.Editor }))
 )
-export default function SqlQueryView({
-  records,
-  setRecords
-}: {
-  records: QueryStatus<PatientTable[]>
-  setRecords: React.Dispatch<React.SetStateAction<QueryStatus<PatientTable[]>>>
-}) {
-  const db = usePGlite()
-  const [sqlQuery, setSqlQuery] = useState('SELECT * FROM patients LIMIT 10')
+export default function SqlQueryView() {
+  const { queryObj, queryResult, setQueryObj } = useLiveQueryProvider()
 
-  const executeQuery = async (query: string) => {
-    setRecords({ type: 'loading' })
-    try {
-      const results = (await db.query(query)).rows as PatientTable[]
-      setRecords({ type: 'success', data: results })
-    } catch (error) {
-      setRecords({ type: 'error', error: error as Error })
-    }
+  const queryStatus = queryResult.status
+  const editorRef = useRef<typeof Editor | null>(null)
+
+  function handleEditorDidMount(editor: typeof Editor) {
+    editorRef.current = editor
+  }
+
+  async function executeQuery() {
+    // @ts-ignore
+    const query = editorRef.current!.getValue() as any as string
+
+
+    setQueryObj((e) => ({ ...e, query }))
   }
 
   return (
@@ -40,10 +37,11 @@ export default function SqlQueryView({
         <div className="flex flex-col flex-1 min-h-0 space-y-4">
           <div className="flex-1 min-h-0 border rounded-md overflow-hidden">
             <Editor
+              // ref={editorRef}
               height="100%"
               language="sql"
-              value={sqlQuery}
-              onChange={(value) => setSqlQuery(value || '')}
+              onMount={handleEditorDidMount}
+              value={queryObj.query}
               theme="vs-light"
               options={{
                 minimap: { enabled: false },
@@ -53,8 +51,8 @@ export default function SqlQueryView({
             />
           </div>
           <Button
-            onClick={() => executeQuery(sqlQuery)}
-            disabled={records.type === 'loading'}
+            onClick={() => executeQuery()}
+            disabled={queryStatus === 'loading'}
             className="w-full flex-none"
           >
             Execute Query
