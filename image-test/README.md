@@ -1,1 +1,1 @@
-- This is a test directory. I created this to test the image upload & saving in pglite.
+- This is a test directory. I created this to test the image upload & saving in pglite. This is not included in app build. 
