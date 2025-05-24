@@ -34,7 +34,10 @@ const formSchema = z.object({
     invalid_type_error: 'Please select a valid sex'
   }),
   dob: z.string().min(1, 'Date of birth is required'),
-  phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phoneNumber: z
+    .string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(15),
   // .regex(
   //   /^\+[1-9]\d{1,14}$/,
   //   'Please enter a valid phone number with country code'
@@ -416,7 +419,7 @@ export default function RegistrationForm() {
                 htmlFor="phoneNumber"
                 className="text-sm font-medium text-gray-700 mb-1"
               >
-                Phone Number (with country code)
+                Phone Number
               </label>
               <input
                 type="tel"
