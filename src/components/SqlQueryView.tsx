@@ -1,17 +1,32 @@
 import { useLiveQueryProvider } from '@/hooks/LiveQueryProvider'
 import { Database } from 'lucide-react'
-import { lazy, useRef } from 'react'
+import { lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 
 const Editor = lazy(() =>
   import('@monaco-editor/react').then((mod) => ({ default: mod.Editor }))
 )
+
+const STORAGE_KEY = 'sql-query-editor-value'
+
 export default function SqlQueryView() {
   const { queryObj, queryResult, setQueryObj } = useLiveQueryProvider()
-
   const queryStatus = queryResult.status
   const editorRef = useRef<typeof Editor | null>(null)
+
+  const defaultValue = `-- Start writing some SQL queries, like SELECT * FROM patients LIMIT 10`
+
+  const initialEditorValue = useMemo(() => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored || queryObj.query || defaultValue
+  }, [])
+
+  const [editorValue, setEditorValue] = useState(initialEditorValue)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, editorValue)
+  }, [editorValue])
 
   function handleEditorDidMount(editor: typeof Editor) {
     editorRef.current = editor
@@ -20,11 +35,8 @@ export default function SqlQueryView() {
   async function executeQuery() {
     // @ts-ignore
     const query = editorRef.current!.getValue() as any as string
-
     setQueryObj((e) => ({ ...e, query }))
   }
-
-  const defaultValue = `-- Start writing some SQL queries, like SELECT * FROM patients LIMIT 10`
 
   return (
     <Card className="flex flex-col h-full">
@@ -38,12 +50,11 @@ export default function SqlQueryView() {
         <div className="flex flex-col flex-1 min-h-0 space-y-4">
           <div className="flex-1 min-h-0 border rounded-md overflow-hidden">
             <Editor
-              defaultValue={defaultValue}
-              // ref={editorRef}
               height="100%"
               language="sql"
               onMount={handleEditorDidMount}
-              value={queryObj.query}
+              value={editorValue}
+              onChange={(value) => setEditorValue(value || '')}
               theme="vs-light"
               options={{
                 minimap: { enabled: false },
