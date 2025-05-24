@@ -230,8 +230,18 @@ export default function RegistrationForm() {
                 name="registrationDateTime"
                 defaultValue=""
                 render={({ field }) => {
+                  // Convert ISO string to local datetime-local input format
                   const displayValue = field.value
-                    ? field.value.slice(0, 16)
+                    ? new Date(field.value)
+                        .toLocaleString('sv-SE', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        })
+                        .replace(' ', 'T')
                     : ''
 
                   return (
@@ -257,7 +267,6 @@ export default function RegistrationForm() {
                           variant="ghost"
                           onClick={() => {
                             const now = new Date().toISOString()
-                            // store full ISO but show sliced in input
                             setValue('registrationDateTime', now)
                           }}
                           className="text-medblocks-blue hover:text-medblocks-blue"

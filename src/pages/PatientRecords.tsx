@@ -16,14 +16,8 @@ export type QueryObj = {
 }
 
 export default function PatientRecords() {
-  // const [, setLocation] = useLocation()
   const [, params] = useRoute('/patient-records/:queryType?')
-
   const isSqlMode = params?.queryType === 'sql'
-
-  // function handleQueryTypeChange(isSqlMode: boolean) {
-  //   setLocation(`/patient-records/${isSqlMode ? 'sql' : 'simple'}`)
-  // }
 
   return (
     //  since  the query state is being used multiple times in child components, let's use a provider instead of prop drilling

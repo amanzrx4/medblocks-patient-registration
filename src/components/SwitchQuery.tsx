@@ -14,7 +14,7 @@ export default function SwitchQuery({ isSqlMode }: SwitchQueryProps) {
   function handleQueryTypeChange(isSqlMode: boolean) {
     setLocation(`/patient-records/${isSqlMode ? 'sql' : 'simple'}`)
 
-    // this will reset the query on switch :/ ? not sure if we should do this
+    // this will reset the query on switch
     setQueryObj({ params: [], query: "" })
   }
 
