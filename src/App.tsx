@@ -1,3 +1,4 @@
+import { dbSetUp, type PGliteWorkerWithLive } from '@/utils'
 import { PGliteProvider } from '@electric-sql/pglite-react'
 import { useEffect, useRef, useState } from 'react'
 import { Route } from 'wouter'
@@ -6,7 +7,6 @@ import TestComp from './components/TestComp'
 import HomePage from './pages/Home'
 import PatientRecords from './pages/PatientRecords'
 import RegistrationPage from './pages/Registration'
-import { dbSetUp, type PGliteWorkerWithLive } from '@/utils'
 
 // we need routes
 // - home Route
@@ -15,45 +15,62 @@ import { dbSetUp, type PGliteWorkerWithLive } from '@/utils'
 // patient query route
 
 function App() {
-  const [db, setDb] = useState<PGliteWorkerWithLive>()
+  const [db, setDb] = useState<PGliteWorkerWithLive | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const hasInitialized = useRef(false)
 
   useEffect(() => {
     if (hasInitialized.current) return
     hasInitialized.current = true
 
-    // // clear the db first
-    // indexedDB.deleteDatabase(`${DB_NAME}`)
-    // console.log('db deleted')
+    const initializeDb = async () => {
+      try {
+        const dbInstance = await dbSetUp()
+        setDb(dbInstance)
+        console.log('Db setup success')
+      } catch (error) {
+        console.error('Failed to initialize database:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    dbSetUp().then(async (db) => {
-      setDb(db)
-      console.log('Db setup success')
-    })
+    initializeDb()
   }, [])
-
-  if (!db) {
-    return <h1>Initializing db</h1>
-  }
 
   return (
     <>
-      <PGliteProvider db={db}>
-        <Navbar />
-        <Route path="/">
-          <HomePage />
-        </Route>
-        <Route path="/patient-registration">
-          <RegistrationPage />
-        </Route>
-        <Route path="/patient-records/:queryType?">
-          <PatientRecords />
-        </Route>
-
-        <Route path="/test">
-          <TestComp />
-        </Route>
-      </PGliteProvider>
+      <Navbar />
+      <main>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64 flex-col gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <h1 className="text-xl font-semibold mt-2">
+              Loading...(Initializing Database)
+            </h1>
+          </div>
+        ) : db ? (
+          <PGliteProvider db={db}>
+            <Route path="/" component={HomePage} />
+            <Route path="/patient-registration" component={RegistrationPage} />
+            <Route
+              path="/patient-records/:queryType?"
+              component={PatientRecords}
+            />
+            <Route path="/test" component={TestComp} />
+          </PGliteProvider>
+        ) : (
+          <div className="text-center py-8">
+            <h2 className="text-xl font-semibold mb-2">
+              Database Initialization Failed
+            </h2>
+            <p className="text-muted-foreground">
+              Unable to connect to the database. Please refresh the page to try
+              again.
+            </p>
+          </div>
+        )}
+      </main>
     </>
   )
 }
