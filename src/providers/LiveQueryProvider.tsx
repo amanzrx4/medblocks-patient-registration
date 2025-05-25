@@ -25,11 +25,11 @@ function createInitialContextValue<T>(): LiveQueryContextValue<T> {
 
 const LiveQueryContext = createContext<LiveQueryContextValue<unknown>>(createInitialContextValue())
 
-type LiveQueryProviderProps<T> = {
+type LiveQueryProviderProps = {
   children: ReactNode
 }
 
-export function LiveQueryProvider<T = unknown>({ children }: LiveQueryProviderProps<T>) {
+export function LiveQueryProvider<T = unknown>({ children }: LiveQueryProviderProps) {
   const [queryObj, setQueryObj] = useState<QueryObj>(INITIAL_QUERY)
 
   const queryResult = useLiveQuery<T>({
