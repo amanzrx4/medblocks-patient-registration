@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -147,6 +147,17 @@ export default function ResultsTable() {
 
   const records = (queryResult.data?.rows as Partial<PatientTable>[]) || []
 
+  // Calculate if we have matching keys for export
+  const hasMatchingKeys = useMemo(() => {
+    if (records.length === 0) return false
+    const firstRow = records[0]
+    if (!firstRow) return false
+    const allKeys = Object.keys(firstRow)
+    return allKeys.some((key) =>
+      patientTableKeys.includes(key as keyof PatientTable)
+    )
+  }, [records])
+
   const handleExport = () => {
     // if (records.type !== 'success' || records.length === 0) return
 
@@ -207,7 +218,7 @@ export default function ResultsTable() {
         <CardFooter className="flex-none border-t p-4">
           <Button
             onClick={handleExport}
-            disabled={records.length === 0 || isExporting}
+            disabled={records.length === 0 || isExporting || !hasMatchingKeys}
             className="w-full"
             variant="outline"
           >
