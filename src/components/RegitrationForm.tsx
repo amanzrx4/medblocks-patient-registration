@@ -143,9 +143,19 @@ export default function RegistrationForm() {
         )
       `
 
+      const kvPair = keyValuePairs?.reduce(
+        (acc, curr) => {
+          acc[curr.name] = curr.data
+          return acc
+        },
+        {} as Record<string, string>
+      )
+
       const values = [
         registrationDateTime,
-        keyValuePairs ? JSON.stringify(keyValuePairs) : null,
+        kvPair && Object.keys(kvPair).length > 0
+          ? JSON.stringify(kvPair)
+          : null,
         firstName,
         lastName || null,
         sex,

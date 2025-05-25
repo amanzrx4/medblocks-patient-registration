@@ -46,7 +46,6 @@ export default function PatientDetailsDialog({
     )
   }
 
-  console.log('key_value_pairs', patient.key_value_pairs)
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -121,21 +120,20 @@ export default function PatientDetailsDialog({
                     Additional Information
                   </h3>
                   <div className="rounded-md border bg-gray-50 p-3 space-y-4">
-                    {/* @ts-ignore */}
-                    {patient.key_value_pairs.map((p) => {
-                      const name = p.name
-                      const data = p.data
-                      return (
-                        <div key={name} className="space-y-1">
-                          <p className="text-sm font-medium text-gray-500">
-                            {name}
-                          </p>
-                          <p className="text-sm text-gray-900 whitespace-pre-wrap break-words">
-                            {data}
-                          </p>
-                        </div>
-                      )
-                    })}
+                    {Object.entries(patient.key_value_pairs).map(
+                      ([name, data]) => {
+                        return (
+                          <div key={name} className="space-y-1">
+                            <p className="text-sm font-medium text-gray-500">
+                              {name}
+                            </p>
+                            <p className="text-sm text-gray-900 whitespace-pre-wrap break-words">
+                              {data}
+                            </p>
+                          </div>
+                        )
+                      }
+                    )}
                   </div>
                 </div>
               )}

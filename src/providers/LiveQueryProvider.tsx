@@ -1,5 +1,4 @@
 import type { QueryObj } from '@/pages/PatientRecords'
-import type { PatientTable } from '@/utils'
 import { createContext, type ReactNode, useContext, useState } from 'react'
 import type { UseLiveQueryResult } from '../hooks/useLiveQuery'
 import useLiveQuery from '../hooks/useLiveQuery'
@@ -12,32 +11,33 @@ type LiveQueryContextValue<T> = {
 
 export const INITIAL_QUERY: QueryObj = { query: undefined, params: [] }
 
-export const CONTEXT_VAL_INITIAL: LiveQueryContextValue<PatientTable> = {
-  setQueryObj: function () {},
-  queryObj: INITIAL_QUERY,
-  queryResult: {
-    status: 'idle',
-    data: undefined,
-    error: null
+function createInitialContextValue<T>(): LiveQueryContextValue<T> {
+  return {
+    setQueryObj: function () {},
+    queryObj: INITIAL_QUERY,
+    queryResult: {
+      status: 'idle',
+      data: undefined,
+      error: null
+    } as UseLiveQueryResult<T>
   }
 }
 
-const LiveQueryContext =
-  createContext<LiveQueryContextValue<PatientTable>>(CONTEXT_VAL_INITIAL)
+const LiveQueryContext = createContext<LiveQueryContextValue<unknown>>(createInitialContextValue())
 
 type LiveQueryProviderProps = {
   children: ReactNode
 }
 
-export function LiveQueryProvider({ children }: LiveQueryProviderProps) {
+export function LiveQueryProvider<T = unknown>({ children }: LiveQueryProviderProps) {
   const [queryObj, setQueryObj] = useState<QueryObj>(INITIAL_QUERY)
 
-  const queryResult = useLiveQuery<PatientTable>({
+  const queryResult = useLiveQuery<T>({
     query: queryObj.query,
     params: queryObj.params
   })
 
-  const contextValue: LiveQueryContextValue<PatientTable> = {
+  const contextValue: LiveQueryContextValue<T> = {
     queryObj,
     setQueryObj,
     queryResult
@@ -50,8 +50,8 @@ export function LiveQueryProvider({ children }: LiveQueryProviderProps) {
   )
 }
 
-export function useLiveQueryContext() {
-  const context = useContext(LiveQueryContext)
+export function useLiveQueryContext<T = unknown>() {
+  const context = useContext<LiveQueryContextValue<T>>(LiveQueryContext as React.Context<LiveQueryContextValue<T>>)
   if (!context) {
     throw new Error(
       'useLiveQueryContext must be used within a LiveQueryProvider'
@@ -60,7 +60,7 @@ export function useLiveQueryContext() {
   return context
 }
 
-export function useLiveQueryProvider() {
-  const context = useLiveQueryContext()
+export function useLiveQueryProvider<T = unknown>() {
+  const context = useLiveQueryContext<T>()
   return context
 }

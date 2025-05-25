@@ -16,22 +16,25 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { useLiveQueryProvider } from '@/providers/LiveQueryProvider'
 import type { UseLiveQueryResult } from '@/hooks/useLiveQuery'
-import type { PatientTable } from '@/utils'
+import { useLiveQueryProvider } from '@/providers/LiveQueryProvider'
+import { patientTableKeys, type PatientTable } from '@/utils'
 import {
+  cleanArray,
   excelExport,
-  getFormattedDate,
-  uint8ArrayToDataURL
+  formatKey,
+  formatValueForObj
 } from '@/utils/helpers'
 import { AlertCircle, Download, Loader } from 'lucide-react'
-import { Alert, AlertDescription } from './ui/alert'
 import PatientDetailsDialog from './PatientDetailsDialog'
+import { Alert, AlertDescription } from './ui/alert'
 
 function renderResultsTable(
-  queryResult: UseLiveQueryResult<PatientTable>,
+  queryResult: UseLiveQueryResult<unknown>,
   setSelectedPatient: React.Dispatch<React.SetStateAction<PatientTable | null>>
 ) {
+  console.log('queryResult', queryResult)
+
   if (queryResult.status === 'idle') {
     return (
       <div className="p-2 flex items-center justify-center">
@@ -58,67 +61,74 @@ function renderResultsTable(
   }
 
   if (queryResult.status === 'success') {
+    const rows = queryResult.data?.rows || []
+
+    if (rows.length === 0) {
+      return (
+        <div className="p-4 text-center text-gray-500">No data available</div>
+      )
+    }
+
+    const rowObject = rows[0]
+
+    const allKeys = Object.keys(rowObject as Record<string, unknown>)
+
+    // see how many keys are matching the patient table keys
+    const keysMatching = allKeys.filter((key) =>
+      patientTableKeys.includes(key as keyof PatientTable)
+    )
+
+    if (keysMatching.length === 0) {
+      return (
+        <div className="p-4 bg-gray-50 rounded-md overflow-auto">
+          <pre className="text-xs">{JSON.stringify(rows, null, 2)}</pre>
+        </div>
+      )
+    }
+
+    const filteredRows = cleanArray(rows)
+
     return (
-      <div className="rounded-md border p-2">
+      <div className="rounded-md border p-2 overflow-auto">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              <TableHead>Index</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Registration Date</TableHead>
-              <TableHead>Photo</TableHead>
+              <TableHead>#</TableHead>
+              {Object.keys(filteredRows[0]).map((key) => (
+                <TableHead key={key}>{formatKey(key)}</TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {queryResult.data!.rows.map((patient, idx) => {
-              const patientPhotoSrc =
-                patient.photo && uint8ArrayToDataURL(patient.photo!)
+            {filteredRows.map((row, idx) => (
+              <TableRow
+                key={idx}
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => setSelectedPatient(row as PatientTable)}
+              >
+                <TableCell className="whitespace-nowrap">{idx + 1}</TableCell>
 
-              const formattedDate = getFormattedDate(
-                new Date(patient.registration_datetime)
-              )
-
-              return (
-                <TableRow
-                  key={patient.id}
-                  className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => setSelectedPatient(patient)}
-                >
-                  <TableCell>{idx + 1}</TableCell>
-                  <TableCell>
-                    {patient.first_name} {patient.last_name}
-                  </TableCell>
-                  <TableCell>{patient.email}</TableCell>
-                  <TableCell>{patient.phone_number}</TableCell>
-                  <TableCell>{formattedDate}</TableCell>
-                  <TableCell>
-                    {patient.photo ? (
-                      <img
-                        className="w-10 h-10 rounded-full object-cover"
-                        src={patientPhotoSrc}
-                        alt={`${patient.first_name} ${patient.last_name || ''}`}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">
-                          {patient.first_name[0]}
-                          {patient.last_name?.[0] || ''}
-                        </span>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-            {queryResult.data!.rows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-4">
-                  No patients found
-                </TableCell>
+                {Object.keys(filteredRows[0]).map((key) => {
+                  const value = formatValueForObj(
+                    key as keyof PatientTable,
+                    row[key]
+                  )
+                  return (
+                    <TableCell
+                      key={key}
+                      className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap   hover:bg-gray-50 transition-all"
+                      title={
+                        typeof value === 'string'
+                          ? value
+                          : JSON.stringify(value)
+                      }
+                    >
+                      {value}
+                    </TableCell>
+                  )
+                })}
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>
@@ -132,32 +142,33 @@ export default function ResultsTable() {
   const [selectedPatient, setSelectedPatient] = useState<PatientTable | null>(
     null
   )
+
   const [isExporting, setIsExporting] = useState(false)
 
-  const records = queryResult.data?.rows || []
+  const records = (queryResult.data?.rows as Partial<PatientTable>[]) || []
 
   const handleExport = () => {
     // if (records.type !== 'success' || records.length === 0) return
 
     setIsExporting(true)
     try {
-      const excelData = records.map((patient, idx) => ({
-        Index: idx + 1,
-        'First Name': patient.first_name,
+      const excelData = records.map<Record<string, string>>((patient, idx) => ({
+        Index: (idx + 1).toString(),
+        'First Name': patient.first_name || '',
         'Last Name': patient.last_name || '',
-        Email: patient.email,
-        Phone: patient.phone_number,
-        'Registration Date': new Date(
-          patient.registration_datetime
-        ).toLocaleString(),
-        Sex: patient.sex,
-        'Date of Birth': patient.dob,
-        'Address Line 1': patient.address_line1,
+        Email: patient.email || '',
+        Phone: patient.phone_number || '',
+        'Registration Date': patient.registration_datetime
+          ? new Date(patient.registration_datetime).toLocaleString()
+          : '',
+        Sex: patient.sex || '',
+        'Date of Birth': patient.dob || '',
+        'Address Line 1': patient.address_line1 || '',
         'Address Line 2': patient.address_line2 || '',
-        City: patient.city,
-        State: patient.state,
-        'Postal Code': patient.postal_code,
-        Reason: patient.reason,
+        City: patient.city || '',
+        State: patient.state || '',
+        'Postal Code': patient.postal_code || '',
+        Reason: patient.reason || '',
         'Additional Notes': patient.additional_notes || '',
         'Patient History': patient.patient_history || ''
       }))
@@ -196,12 +207,7 @@ export default function ResultsTable() {
         <CardFooter className="flex-none border-t p-4">
           <Button
             onClick={handleExport}
-            disabled={
-              records.length === 0
-              // records.type !== 'success' ||
-              // records.data.length === 0 ||
-              // isExporting
-            }
+            disabled={records.length === 0 || isExporting}
             className="w-full"
             variant="outline"
           >
