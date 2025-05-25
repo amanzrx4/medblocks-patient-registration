@@ -5,7 +5,6 @@ import {
   SheetContent,
   SheetTrigger
 } from '@/components/ui/sheet'
-import { MEDBLOCKS_LOGO_URL_X } from '@/utils'
 import { Link } from 'wouter'
 
 const menuItems = [
@@ -35,7 +34,7 @@ export default function Navbar() {
         </SheetTrigger>
         <SheetContent side="left">
           <Link href="/" className="mr-6 hidden lg:flex">
-            <img src={MEDBLOCKS_LOGO_URL_X} alt="medblocks" />
+            <img src="/medblocks.svg" alt="medblocks" />
             <span className="sr-only">Medblocks</span>
           </Link>
           <div className="grid gap-2 py-6 ml-2">
@@ -53,11 +52,7 @@ export default function Navbar() {
         </SheetContent>
       </Sheet>
       <Link href="/" className="mr-6 hidden lg:flex items-center gap-2">
-        <img
-          className="h-12 w-auto"
-          src={MEDBLOCKS_LOGO_URL_X}
-          alt="medblocks"
-        />
+        <img className="h-12 w-auto" src="/medblocks.svg" alt="medblocks" />
         <span className="sr-only">Medblocks</span>
         <h1 className="text-xl font-bold text-medblocks-blue">Medblocks</h1>
       </Link>
