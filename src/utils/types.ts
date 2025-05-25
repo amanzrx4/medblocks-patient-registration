@@ -43,4 +43,7 @@ export type QueryStatus<T> =
       data: T
     }
 
-export type SuccessQueryData<T> = Extract<QueryStatus<T>, { type: 'success' }>['data']
+export type SuccessQueryData<T> = Extract<
+  QueryStatus<T>,
+  { type: 'success' }
+>['data']

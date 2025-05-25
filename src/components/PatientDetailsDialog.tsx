@@ -123,7 +123,6 @@ export default function PatientDetailsDialog({
                   <div className="rounded-md border bg-gray-50 p-3 space-y-4">
                     {/* @ts-ignore */}
                     {patient.key_value_pairs.map((p) => {
-
                       const name = p.name
                       const data = p.data
                       return (
