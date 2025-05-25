@@ -29,6 +29,7 @@ export default function TestComp() {
   return (
     <div className="flex flex-col gap-2 items-center">
       <Input
+        className="max-w-xs"
         value={count}
         onChange={(e) => {
           const value = e.target.value
@@ -44,8 +45,8 @@ export default function TestComp() {
         {isAdding ? 'Seeding...' : 'Seed records'}
       </Button>
 
-      <h1 className="text-3xl">LEADER: {db.isLeader}</h1>
-      <h1 className="text-5xl">RECORDS LENGTH: {records?.rows.length}</h1>
+      <h1 className="text-3xl">IS LEADER: {db.isLeader === true ? 'Yes' : 'No'}</h1>
+      <h1 className="text-4xl">RECORDS LENGTH: {records?.rows.length}</h1>
     </div>
   )
 }
