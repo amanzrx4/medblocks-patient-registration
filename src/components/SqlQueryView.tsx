@@ -15,7 +15,8 @@ export default function SqlQueryView() {
   const queryStatus = queryResult.status
   const editorRef = useRef<typeof Editor | null>(null)
 
-  const defaultValue = `-- Start writing some SQL queries, like SELECT * FROM patients LIMIT 10`
+  const defaultValue = `-- Start writing some SQL queries
+-- SELECT * FROM patients LIMIT 10`
 
   const initialEditorValue = useMemo(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
