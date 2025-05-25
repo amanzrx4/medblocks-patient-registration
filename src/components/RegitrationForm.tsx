@@ -1,5 +1,5 @@
 import { usePGlite } from '@electric-sql/pglite-react'
-import { DevTool } from '@hookform/devtools'
+// import { DevTool } from '@hookform/devtools'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Camera, HelpCircle, X } from 'lucide-react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
@@ -687,7 +687,7 @@ export default function RegistrationForm() {
           </div>
         </form>
       </div>
-      <DevTool control={control} />
+      {/* <DevTool control={control} /> */}
     </TooltipProvider>
   )
 }
