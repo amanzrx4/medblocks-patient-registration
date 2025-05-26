@@ -1,8 +1,10 @@
 # Medblocks Patient Registration System
 
 
+### Loom video explaining the app: 
 https://www.loom.com/share/3b0444e025c446d78de4585556a728b2?sid=f98d12a2-ddca-4189-86d0-769120f4fc38
 
+### production link: 
 https://medblocks-patient-registration.netlify.app
 
 A modern web application for managing patient registrations and records
